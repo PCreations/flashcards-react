@@ -6,7 +6,7 @@ import { Home } from '../Home';
 
 describe('Home', () => {
   afterEach(cleanup);
-  test('it should renders the name of the application and a button to sign in with Github', () => {
+  test('it should render the name of the application and a button to sign in with Github', () => {
     const { getByText, getByLabelText } = render(<Home onSignInClicked={jest.fn} />);
     expect(getByText('Flashcards')).toBeInTheDocument();
     expect(getByLabelText(/sign in with github/i)).toBeInTheDocument();

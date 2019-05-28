@@ -4,7 +4,7 @@ describe('When the user is logged in', () => {
       const userId = `user-${Math.random()}`;
       cy.login({ userId });
       cy.visit('/');
-      cy.contains('No flashcards box yet ! Create one');
+      cy.contains('No flashcards box yet !');
       cy.get('button[data-testid=createBox]').should('be.visible');
     });
   });
