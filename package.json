@@ -38,7 +38,11 @@
   "devDependencies": {
     "@bahmutov/add-typescript-to-cypress": "^2.1.0",
     "@cypress/watch-preprocessor": "^1.0.0",
+    "@types/user-event": "^1.4.1",
     "cypress": "^3.3.1",
+    "jest-dom": "^3.4.0",
+    "react-testing-library": "^7.0.1",
+    "user-event": "^3.0.3",
     "webpack": "^4.32.2"
   }
 }
