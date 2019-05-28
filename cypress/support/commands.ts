@@ -1,18 +1,18 @@
-import { authEvents } from '../../src/core/events/authEvents';
-import { FlashcardsApp } from '../../src/core/FlashcardsApp';
-export {};
+import 'cypress-testing-library/add-commands';
+import { FlashcardsAppStore } from '../../src/core/store';
+import { userAuthenticated } from '../../src/core/store/auth/events';
 declare global {
   namespace Cypress {
     interface Chainable {
-      login: ({ userId }: { userId: string }) => void;
+      login: () => void;
     }
   }
   interface Window {
-    FlashcardsApp: FlashcardsApp;
+    FlashcardsAppStore: FlashcardsAppStore;
   }
 }
-Cypress.Commands.add('login', ({ userId }) => {
-  cy.window().then(window => {
-    window.FlashcardsApp.dispatch(authEvents.authenticated({ userId }));
-  });
+Cypress.Commands.add('login', () => {
+  cy.window()
+    .its('FlashcardsAppStore')
+    .then(store => store.dispatch(userAuthenticated({ userId: '42' })));
 });

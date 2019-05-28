@@ -1,5 +1,6 @@
-import { FlashcardsApp } from '../FlashcardsApp';
-import { AuthenticationGateway } from '../AuthenticationGateway';
+import { createStore } from '../store';
+import { userAuthenticated } from '../store/auth/events';
+import { readCurrentUser } from '../store/auth/selectors';
 
 test(`
   given the user is not authenticated
@@ -7,14 +8,10 @@ test(`
   then the current user status should be 'AUTHENTICATED'
   and the current user id should 42
 `, async () => {
-  const authenticationGateway = AuthenticationGateway({
-    signIn: () => Promise.resolve({ userId: '42' }),
-  });
-  const app = FlashcardsApp({ authenticationGateway });
-  await app.signIn();
-  expect(app.readCurrentUser()).toEqual({
+  const store = createStore();
+  store.dispatch(userAuthenticated({ userId: '42' }));
+  expect(readCurrentUser(store.getState())).toEqual({
     status: 'AUTHENTICATED',
     userId: '42',
   });
 });
-export {};

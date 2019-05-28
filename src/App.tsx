@@ -1,13 +1,30 @@
 import React from 'react';
-import './App.css';
+import { connect } from 'react-redux';
+import { FlashcardsAppState } from './core/store';
+import * as authCommands from './core/store/auth/commands';
+import { Home } from './Home';
+import { BoxListEmptyState } from './BoxListEmptyState';
 
-const App: React.FC = () => {
-  return (
-    <div>
-      <h1>Flashcard</h1>
-      <button data-testid="signInWithGithub">Sign in with Github</button>
-    </div>
+type AppProps = {
+  isUserAuthenticated: boolean;
+  onSignInClicked: () => void;
+  createNewBox: () => void;
+};
+
+const App: React.FC<AppProps> = ({ isUserAuthenticated, createNewBox, onSignInClicked }) => {
+  return isUserAuthenticated ? (
+    <BoxListEmptyState createNewBox={createNewBox} />
+  ) : (
+    <Home onSignInClicked={onSignInClicked} />
   );
 };
 
-export default App;
+export default connect(
+  (state: FlashcardsAppState) => ({
+    isUserAuthenticated: state.auth.currentUser.status === 'AUTHENTICATED',
+  }),
+  dispatch => ({
+    onSignInClicked: () => dispatch(authCommands.authenticateUser()),
+    createNewBox: () => {},
+  }),
+)(App);

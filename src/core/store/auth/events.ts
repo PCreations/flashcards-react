@@ -1,6 +1,9 @@
-import { AuthUser, AuthEventTypes, USER_AUTHENTICATED } from './types';
+import { AuthEventTypes, USER_AUTHENTICATED } from './types';
 
-export const userAuthenticated = (currentUser: AuthUser): AuthEventTypes => ({
+export const userAuthenticated = ({ userId }: { userId: string }): AuthEventTypes => ({
   type: USER_AUTHENTICATED,
-  payload: currentUser,
+  payload: {
+    userId,
+    status: 'AUTHENTICATED',
+  },
 });

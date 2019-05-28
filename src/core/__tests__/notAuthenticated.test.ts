@@ -1,15 +1,12 @@
-import { FlashcardsApp } from '../FlashcardsApp';
-import { AuthenticationGateway } from '../AuthenticationGateway';
+import { createStore } from '../store';
+import { readCurrentUser } from '../store/auth/selectors';
 
 test(`
   given the user is not authenticated
   then the current user status should be 'NOT_AUTHENTICATED'
 `, () => {
-  const app = FlashcardsApp({
-    authenticationGateway: AuthenticationGateway({ signIn: () => Promise.resolve({ userId: 'foo' }) }),
-  });
-  expect(app.readCurrentUser()).toEqual({
+  const store = createStore();
+  expect(readCurrentUser(store.getState())).toEqual({
     status: 'NOT_AUTHENTICATED',
   });
 });
-export {};
