@@ -6,7 +6,10 @@ const initialState: AuthState = {
   },
 };
 
-export const authReducer = (state = initialState, event: AuthEventTypes) => {
+export const authReducer = (state = initialState, event?: AuthEventTypes) => {
+  if (!event) {
+    return state;
+  }
   switch (event.type) {
     case 'USER_AUTHENTICATED':
       return {
