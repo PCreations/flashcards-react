@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import axios from 'axios';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
@@ -12,7 +13,9 @@ declare global {
   }
 }
 
-window.FlashcardsAppStore = createStore();
+window.FlashcardsAppStore = createStore({
+  fetchBoxes: () => axios.get('/boxes/').then(response => response.data),
+});
 
 ReactDOM.render(
   <Provider store={window.FlashcardsAppStore}>

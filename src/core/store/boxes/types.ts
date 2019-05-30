@@ -16,6 +16,7 @@ export interface BoxesState {
 
 export const BOXES_FETCHING_STARTED = 'BOXES_FETCHING_STARTED';
 export const BOXES_RECEIVED = 'BOXES_RECEIVED';
+export const FETCH_BOXES = 'FETCH_BOXES';
 
 interface BoxesFetchingStartedEvent {
   type: typeof BOXES_FETCHING_STARTED;

@@ -26,4 +26,5 @@ export const boxesReducer = (state = initialState, event?: BoxesEventTypes) => {
       ),
     };
   }
+  return state;
 };

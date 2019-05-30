@@ -1,6 +1,6 @@
 import React from 'react';
 
-type BoxListEmptyStateProps = {
+export type BoxListEmptyStateProps = {
   createNewBox: () => void;
 };
 

@@ -1,30 +1,32 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FlashcardsAppState } from './core/store';
+import { FlashcardsAppState, FlashcardsAppDependencies } from './core/store';
 import * as authCommands from './core/store/auth/commands';
 import { Home } from './Home';
-import { BoxListEmptyState } from './BoxListEmptyState';
+import BoxScreen from './BoxScreen';
+import { fetchBoxes } from './core/store/boxes/behaviors';
+import { ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from 'redux';
+import { readCurrentUser } from './core/store/auth/selectors';
+import { readBoxes } from './core/store/boxes/selectors';
 
 type AppProps = {
   isUserAuthenticated: boolean;
   onSignInClicked: () => void;
-  createNewBox: () => void;
 };
 
-const App: React.FC<AppProps> = ({ isUserAuthenticated, createNewBox, onSignInClicked }) => {
-  return isUserAuthenticated ? (
-    <BoxListEmptyState createNewBox={createNewBox} />
-  ) : (
-    <Home onSignInClicked={onSignInClicked} />
-  );
+const App: React.FC<AppProps> = ({ isUserAuthenticated, onSignInClicked }) => {
+  return isUserAuthenticated ? <BoxScreen /> : <Home onSignInClicked={onSignInClicked} />;
 };
 
 export default connect(
   (state: FlashcardsAppState) => ({
-    isUserAuthenticated: state.auth.currentUser.status === 'AUTHENTICATED',
+    isUserAuthenticated: readCurrentUser(state).status === 'AUTHENTICATED',
+    boxes: readBoxes(state).data,
   }),
-  dispatch => ({
+  (dispatch: ThunkDispatch<FlashcardsAppState, FlashcardsAppDependencies, AnyAction>) => ({
     onSignInClicked: () => dispatch(authCommands.authenticateUser()),
+    fetchBoxes: () => dispatch(fetchBoxes()),
     createNewBox: () => {},
   }),
 )(App);
