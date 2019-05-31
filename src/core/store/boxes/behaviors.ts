@@ -12,5 +12,6 @@ export const fetchBoxes = (): ThunkAction<
   console.log('toto');
   dispatch(boxFetchingStarted());
   const boxes = await deps.fetchBoxes();
+  console.log('boxes', boxes);
   dispatch(boxesReceived({ boxes }));
 };

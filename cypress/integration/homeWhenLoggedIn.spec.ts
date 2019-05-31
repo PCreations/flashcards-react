@@ -12,16 +12,19 @@ describe('When the user is logged in', () => {
     it('should see the list of its boxes with their respective number of flashcards and archived flashcards', () => {
       const boxes = [
         {
+          id: 'box1',
           boxName: 'Capitals of the World',
           totalFlashcards: 50,
           archivedFlashcards: 20,
         },
         {
+          id: 'box2',
           boxName: 'Some other box',
           totalFlashcards: 40,
           archivedFlashcards: 0,
         },
         {
+          id: 'box3',
           boxName: 'Some other box 2',
           totalFlashcards: 75,
           archivedFlashcards: 50,
@@ -36,9 +39,17 @@ describe('When the user is logged in', () => {
       cy.visit('/');
       cy.login();
       cy.contains('Select a box');
-      cy.getAllByTestId('boxName').should('equal', boxes.map(b => b.boxName));
-      cy.getAllByTestId('boxFlashcardsTotal').should('equal', boxes.map(b => b.totalFlashcards));
-      cy.getAllByTestId('boxArchivedFlashcards').should('equal', boxes.map(b => b.archivedFlashcards));
+      cy.getAllByTestId('boxName').each((el, index) => {
+        expect(el.text()).equal(boxes[index].boxName);
+      });
+      cy.getAllByTestId('boxFlashcardsTotal').each((el, index) => {
+        expect(el.text()).equal(`${boxes[index].totalFlashcards}`);
+      });
+      cy.getAllByTestId('boxArchivedFlashcards').each((el, index) => {
+        if (boxes[index].archivedFlashcards > 0) {
+          expect(el.text()).equal(`${boxes[index].archivedFlashcards}`);
+        }
+      });
     });
   });
 });
