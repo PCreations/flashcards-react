@@ -1,6 +1,5 @@
 import { FlashcardsAppState } from '..';
 
-export const readBoxes = (state: FlashcardsAppState) => ({
-  loading: state.boxes.loading,
-  data: Object.values(state.boxes.data),
-});
+export const getBoxes = (state: FlashcardsAppState) => Object.values(state.boxes.data);
+
+export const getBoxesRequestStatus = (state: FlashcardsAppState) => state.boxes.boxesRequestStatus;

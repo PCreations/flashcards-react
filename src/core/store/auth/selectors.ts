@@ -1,3 +1,5 @@
 import { FlashcardsAppState } from '..';
 
-export const readCurrentUser = (state: FlashcardsAppState) => state.auth.currentUser;
+export const isUserAuthenticated = (state: FlashcardsAppState) => state.auth.isUserAuthenticated;
+
+export const getAuthenticatedUserId = (state: FlashcardsAppState) => state.auth.userId;

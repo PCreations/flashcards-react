@@ -1,6 +1,6 @@
 import { authReducer } from './auth/reducers';
 import { combineReducers, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
-import thunk, { ThunkMiddleware } from 'redux-thunk';
+import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
 import { boxesReducer } from './boxes/reducers';
 
 export const rootReducer = combineReducers({
@@ -19,16 +19,26 @@ type FetchedBoxData = {
 
 export type FlashcardsAppDependencies = {
   fetchBoxes: () => Promise<FetchedBoxData[]>;
+  signIn: () => Promise<{ userId: string }>;
 };
 
-export const createStore = ({ fetchBoxes }: FlashcardsAppDependencies) =>
+export type FlashcardsThunkMiddleware = ThunkMiddleware<
+  FlashcardsAppState,
+  AnyAction,
+  FlashcardsAppDependencies
+>;
+
+export type FlashcardsThunkAction = ThunkAction<
+  void,
+  FlashcardsAppState,
+  FlashcardsAppDependencies,
+  AnyAction
+>;
+
+export const createStore = ({ fetchBoxes, signIn }: FlashcardsAppDependencies) =>
   createReduxStore(
     rootReducer,
-    applyMiddleware(thunk.withExtraArgument({ fetchBoxes }) as ThunkMiddleware<
-      FlashcardsAppState,
-      AnyAction,
-      FlashcardsAppDependencies
-    >),
+    applyMiddleware(thunk.withExtraArgument({ fetchBoxes, signIn }) as FlashcardsThunkMiddleware),
   );
 
 export type FlashcardsAppStore = ReturnType<typeof createStore>;

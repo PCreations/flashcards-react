@@ -1,6 +1,6 @@
 import 'cypress-testing-library/add-commands';
 import { FlashcardsAppStore } from '../../src/core/store';
-import { userAuthenticated } from '../../src/core/store/auth/events';
+import { userAuthenticated } from '../../src/core/store/auth/actions';
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -14,5 +14,8 @@ declare global {
 Cypress.Commands.add('login', () => {
   cy.window()
     .its('FlashcardsAppStore')
-    .then(store => store.dispatch(userAuthenticated({ userId: '42' })));
+    .then(store => {
+      store.subscribe(() => console.log({ state: store.getState() }));
+      store.dispatch(userAuthenticated({ userId: '42' }));
+    });
 });

@@ -1,20 +1,26 @@
-import { AuthState, NOT_AUTHENTICATED, AuthEventTypes } from './types';
+import { userAuthenticated, AuthActionTypes } from './actions';
 
-const initialState: AuthState = {
-  currentUser: {
-    status: NOT_AUTHENTICATED,
-  },
+type AuthState = {
+  isUserAuthenticated: boolean;
+  userId?: string;
 };
 
-export const authReducer = (state = initialState, event?: AuthEventTypes) => {
-  if (!event) {
+const initialState: AuthState = {
+  isUserAuthenticated: false,
+};
+
+type HandledActions = ReturnType<typeof userAuthenticated>;
+
+export const authReducer = (state = initialState, action?: HandledActions): AuthState => {
+  if (!action) {
     return state;
   }
-  switch (event.type) {
-    case 'USER_AUTHENTICATED':
+  switch (action.type) {
+    case AuthActionTypes.USER_AUTHENTICATED:
       return {
         ...state,
-        currentUser: event.payload,
+        isUserAuthenticated: true,
+        userId: action.payload.userId,
       };
     default:
       return state;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { BoxesRequestStatusEnum } from './core/store/boxes';
 
 type Box = {
   id: string;
@@ -9,12 +10,15 @@ type Box = {
 
 export type BoxListProps = {
   boxes: Box[];
-  loading: boolean;
+  boxesRequestStatus: BoxesRequestStatusEnum;
+  boxesRequestError?: string;
 };
 
-export const BoxList: React.FC<BoxListProps> = ({ boxes, loading }) =>
-  loading ? (
+export const BoxList: React.FC<BoxListProps> = ({ boxes, boxesRequestStatus, boxesRequestError }) =>
+  boxesRequestStatus === BoxesRequestStatusEnum.PENDING ? (
     <div>loading...</div>
+  ) : boxesRequestStatus === BoxesRequestStatusEnum.FAILED ? (
+    <div>{boxesRequestError}</div>
   ) : (
     <div>
       <h1>Select a box :</h1>

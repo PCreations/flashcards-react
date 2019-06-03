@@ -1,27 +1,27 @@
-import { NOT_AUTHENTICATED, AUTHENTICATED } from '../types';
-import { userAuthenticated } from '../events';
 import { createStore } from '../..';
-import { readCurrentUser } from '../selectors';
+import { authenticateUser, isUserAuthenticated, getAuthenticatedUserId } from '..';
+import { userAuthenticated } from '../actions';
 
 test(`
   given a non authenticated visitor
-  then the readCurrentUser should return the current user status as NON_AUTHENTICATED
+  then the isUserAuthenticated selector should return false
 `, () => {
-  const store = createStore({ fetchBoxes: jest.fn() });
-  expect(readCurrentUser(store.getState())).toEqual({
-    status: NOT_AUTHENTICATED,
-  });
+  const store = createStore({ fetchBoxes: jest.fn(), signIn: jest.fn() });
+  expect(isUserAuthenticated(store.getState())).toEqual(false);
 });
 
 test(`
   given a non authenticated visitor
-  when a userAuthenticated event is dispatched for user with id 42
-  then the readCurrentUser should return the current user
-`, () => {
-  const store = createStore({ fetchBoxes: jest.fn() });
-  store.dispatch(userAuthenticated({ userId: '42' }));
-  expect(readCurrentUser(store.getState())).toEqual({
-    userId: '42',
-    status: AUTHENTICATED,
+  given a user with id 42 trying to signin
+  when a authenticateUser action is dispatched for user with id 42
+  then the isUserAuthenticated selector should return true
+  and the getAuthenticatedUserId selector should return 42
+`, async () => {
+  const store = createStore({
+    fetchBoxes: jest.fn(),
+    signIn: jest.fn().mockResolvedValueOnce({ userId: '42' }),
   });
+  await store.dispatch(authenticateUser());
+  expect(isUserAuthenticated(store.getState())).toEqual(true);
+  expect(getAuthenticatedUserId(store.getState())).toEqual('42');
 });

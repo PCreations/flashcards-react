@@ -15,6 +15,7 @@ declare global {
 
 window.FlashcardsAppStore = createStore({
   fetchBoxes: () => axios.get('/boxes/').then(response => response.data),
+  signIn: () => Promise.reject('todo'),
 });
 
 ReactDOM.render(

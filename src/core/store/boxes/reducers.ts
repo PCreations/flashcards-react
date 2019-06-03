@@ -1,30 +1,70 @@
-import { BoxesState, BoxesEventTypes, BOXES_FETCHING_STARTED, BOXES_RECEIVED } from './types';
+import { BoxesActionTypes, boxesRequestStarted, boxesRequestSucceeded, boxesRequestFailed } from './actions';
+import { Box } from './types';
 
-const initialState: BoxesState = {
-  loading: false,
-  data: {},
+type BoxMap = {
+  [key: string]: Box;
 };
 
-export const boxesReducer = (state = initialState, event?: BoxesEventTypes) => {
-  if (!event) return state;
-  if (event.type === BOXES_FETCHING_STARTED) {
-    return {
-      ...state,
-      loading: true,
-    };
-  }
-  if (event.type === BOXES_RECEIVED) {
-    return {
-      ...state,
-      loading: false,
-      data: event.payload.boxes.reduce(
-        (boxes, box) => ({
-          ...boxes,
-          [box.id]: box,
-        }),
-        {},
-      ),
-    };
+export enum BoxesRequestStatusEnum {
+  NEVER_STARTED,
+  PENDING,
+  SUCCEEDED,
+  FAILED,
+}
+
+type BoxesRequestStatus = {
+  status: BoxesRequestStatusEnum;
+  error?: string;
+};
+
+type BoxesState = {
+  data: BoxMap;
+  boxesRequestStatus: BoxesRequestStatus;
+};
+
+const initialState: BoxesState = {
+  data: {},
+  boxesRequestStatus: {
+    status: BoxesRequestStatusEnum.NEVER_STARTED,
+  },
+};
+
+type HandledActions =
+  | ReturnType<typeof boxesRequestStarted>
+  | ReturnType<typeof boxesRequestSucceeded>
+  | ReturnType<typeof boxesRequestFailed>;
+
+export const boxesReducer = (state = initialState, action: HandledActions): BoxesState => {
+  switch (action.type) {
+    case BoxesActionTypes.BOXES_REQUEST_STARTED:
+      return {
+        ...state,
+        boxesRequestStatus: {
+          status: BoxesRequestStatusEnum.PENDING,
+        },
+      };
+    case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:
+      return {
+        ...state,
+        data: action.payload.boxes.reduce(
+          (boxes, box) => ({
+            ...boxes,
+            [box.id]: box,
+          }),
+          {},
+        ),
+        boxesRequestStatus: {
+          status: BoxesRequestStatusEnum.SUCCEEDED,
+        },
+      };
+    case BoxesActionTypes.BOXES_REQUEST_FAILED:
+      return {
+        ...state,
+        boxesRequestStatus: {
+          status: BoxesRequestStatusEnum.FAILED,
+          error: action.payload.error,
+        },
+      };
   }
   return state;
 };
