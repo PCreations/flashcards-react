@@ -1,5 +1,7 @@
+import { List } from 'immutable';
 import { createStore, FlashcardsAppState } from '../..';
 import { getBoxes, getBoxesRequestStatus, BoxesRequestStatusEnum, fetchBoxes } from '..';
+import { Box } from '../types';
 
 test(`
   given no boxes have been fetched yet
@@ -7,8 +9,8 @@ test(`
   and the getBoxesRequestStatus selector should return NEVER_STARTED
 `, () => {
   const store = createStore({ fetchBoxes: jest.fn(), signIn: jest.fn() });
-  expect(getBoxes(store.getState())).toEqual([]);
-  expect(getBoxesRequestStatus(store.getState())).toEqual({ status: BoxesRequestStatusEnum.NEVER_STARTED });
+  expect(getBoxes(store.getState())).toEqual(List());
+  expect(getBoxesRequestStatus(store.getState()).status).toEqual(BoxesRequestStatusEnum.NEVER_STARTED);
 });
 
 test(`
@@ -42,9 +44,9 @@ test(`
   const store = createStore({ fetchBoxes: jest.fn().mockResolvedValueOnce(boxes), signIn: jest.fn() });
   store.subscribe(() => updates.push(store.getState()));
   await store.dispatch(fetchBoxes());
-  expect(getBoxesRequestStatus(updates[0])).toEqual({ status: BoxesRequestStatusEnum.PENDING });
-  expect(getBoxes(updates[1])).toEqual(boxes);
-  expect(getBoxesRequestStatus(updates[1])).toEqual({ status: BoxesRequestStatusEnum.SUCCEEDED });
+  expect(getBoxesRequestStatus(updates[0]).status).toEqual(BoxesRequestStatusEnum.PENDING);
+  expect(getBoxes(updates[1])).toEqual(List(boxes.map(Box)));
+  expect(getBoxesRequestStatus(updates[1]).status).toEqual(BoxesRequestStatusEnum.SUCCEEDED);
 });
 
 test(`
@@ -57,8 +59,8 @@ test(`
   const someError = new Error('some error');
   const store = createStore({ fetchBoxes: jest.fn().mockRejectedValueOnce(someError), signIn: jest.fn() });
   await store.dispatch(fetchBoxes());
-  expect(getBoxes(store.getState())).toEqual([]);
-  expect(getBoxesRequestStatus(store.getState())).toEqual({
+  expect(getBoxes(store.getState())).toEqual(List());
+  expect(getBoxesRequestStatus(store.getState()).toJS()).toEqual({
     status: BoxesRequestStatusEnum.FAILED,
     error: 'some error',
   });

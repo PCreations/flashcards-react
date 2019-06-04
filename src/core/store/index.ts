@@ -1,14 +1,22 @@
+import { Record } from 'immutable';
 import { authReducer } from './auth/reducers';
-import { combineReducers, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
+import { AuthState } from './auth/reducers';
+import { createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
-import { boxesReducer } from './boxes/reducers';
+import { boxesReducer, BoxesState } from './boxes/reducers';
 
-export const rootReducer = combineReducers({
-  auth: authReducer,
-  boxes: boxesReducer,
+const FlashcardsAppState = Record({
+  auth: AuthState(),
+  boxes: BoxesState(),
 });
 
-export type FlashcardsAppState = ReturnType<typeof rootReducer>;
+export type FlashcardsAppState = ReturnType<typeof FlashcardsAppState>;
+
+export const rootReducer = (state = FlashcardsAppState(), action?: any) =>
+  FlashcardsAppState({
+    auth: authReducer(state.auth, action),
+    boxes: boxesReducer(state.boxes, action),
+  });
 
 type FetchedBoxData = {
   id: string;

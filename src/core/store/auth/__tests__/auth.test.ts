@@ -1,6 +1,5 @@
 import { createStore } from '../..';
 import { authenticateUser, isUserAuthenticated, getAuthenticatedUserId } from '..';
-import { userAuthenticated } from '../actions';
 
 test(`
   given a non authenticated visitor

@@ -1,9 +1,6 @@
+import { Record, Map } from 'immutable';
 import { BoxesActionTypes, boxesRequestStarted, boxesRequestSucceeded, boxesRequestFailed } from './actions';
 import { Box } from './types';
-
-type BoxMap = {
-  [key: string]: Box;
-};
 
 export enum BoxesRequestStatusEnum {
   NEVER_STARTED,
@@ -12,59 +9,52 @@ export enum BoxesRequestStatusEnum {
   FAILED,
 }
 
-type BoxesRequestStatus = {
+type BoxesRequestStatusProps = {
   status: BoxesRequestStatusEnum;
   error?: string;
 };
 
-type BoxesState = {
-  data: BoxMap;
+const BoxesRequestStatus = Record<BoxesRequestStatusProps>({
+  status: BoxesRequestStatusEnum.NEVER_STARTED,
+  error: undefined,
+});
+
+type BoxesRequestStatus = ReturnType<typeof BoxesRequestStatus>;
+
+type BoxesStateProps = {
+  data: Map<Box['id'], Box>;
   boxesRequestStatus: BoxesRequestStatus;
 };
 
-const initialState: BoxesState = {
-  data: {},
-  boxesRequestStatus: {
-    status: BoxesRequestStatusEnum.NEVER_STARTED,
-  },
-};
+export const BoxesState = Record<BoxesStateProps>({
+  data: Map(),
+  boxesRequestStatus: BoxesRequestStatus(),
+});
+
+export type BoxesState = ReturnType<typeof BoxesState>;
 
 type HandledActions =
   | ReturnType<typeof boxesRequestStarted>
   | ReturnType<typeof boxesRequestSucceeded>
   | ReturnType<typeof boxesRequestFailed>;
 
-export const boxesReducer = (state = initialState, action: HandledActions): BoxesState => {
+export const boxesReducer = (state = BoxesState(), action?: HandledActions): BoxesState => {
+  if (!action) return state;
   switch (action.type) {
     case BoxesActionTypes.BOXES_REQUEST_STARTED:
-      return {
-        ...state,
-        boxesRequestStatus: {
-          status: BoxesRequestStatusEnum.PENDING,
-        },
-      };
+      return state.setIn(['boxesRequestStatus', 'status'], BoxesRequestStatusEnum.PENDING);
     case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:
-      return {
-        ...state,
-        data: action.payload.boxes.reduce(
-          (boxes, box) => ({
-            ...boxes,
-            [box.id]: box,
-          }),
-          {},
-        ),
-        boxesRequestStatus: {
-          status: BoxesRequestStatusEnum.SUCCEEDED,
-        },
-      };
+      return state
+        .setIn(['boxesRequestStatus', 'status'], BoxesRequestStatusEnum.SUCCEEDED)
+        .set('data', Map(action.payload.boxes.map(box => [box.id, box])));
     case BoxesActionTypes.BOXES_REQUEST_FAILED:
-      return {
-        ...state,
-        boxesRequestStatus: {
+      return state.set(
+        'boxesRequestStatus',
+        BoxesRequestStatus({
           status: BoxesRequestStatusEnum.FAILED,
           error: action.payload.error,
-        },
-      };
+        }),
+      );
   }
   return state;
 };

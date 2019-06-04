@@ -16,7 +16,8 @@
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "typescript": "3.4.5",
-    "unstated-next": "^1.1.0"
+    "unstated-next": "^1.1.0",
+    "with-immutable-props-to-js": "^1.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -46,6 +47,7 @@
     "@types/faker": "^4.1.5",
     "@types/lodash.isequal": "^4.5.5",
     "@types/react-redux": "^7.0.9",
+    "@types/redux-immutable": "^4.0.1",
     "@types/user-event": "^1.4.1",
     "cypress": "^3.3.1",
     "cypress-testing-library": "^3.0.1",

@@ -14,7 +14,6 @@ type BoxScreenProps = BoxListProps &
 
 const BoxScreen: React.FC<BoxScreenProps> = ({ boxes, boxesRequestStatus, fetchBoxes, createNewBox }) => {
   useEffect(() => {
-    console.log({ length: boxes.length, boxesRequestStatus });
     if (boxesRequestStatus === BoxesRequestStatusEnum.NEVER_STARTED) {
       fetchBoxes();
     }
@@ -26,13 +25,27 @@ const BoxScreen: React.FC<BoxScreenProps> = ({ boxes, boxesRequestStatus, fetchB
   );
 };
 
+const mapStateToProps = (state: FlashcardsAppState) => ({
+  boxes: getBoxes(state),
+  boxesRequestStatus: getBoxesRequestStatus(state).status,
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<FlashcardsAppState, FlashcardsAppDependencies, AnyAction>,
+) => ({
+  createNewBox: () => {},
+  fetchBoxes: () => dispatch(fetchBoxes()),
+});
+
+const withImmutablePropsToJS = (BoxScreen: React.FC<BoxScreenProps>) => {
+  const Wrapper: React.FC<ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>> = ({
+    boxes,
+    ...rest
+  }) => <BoxScreen boxes={boxes.toJS()} {...rest} />;
+  return Wrapper;
+};
+
 export default connect(
-  (state: FlashcardsAppState) => ({
-    boxes: getBoxes(state),
-    boxesRequestStatus: getBoxesRequestStatus(state).status,
-  }),
-  (dispatch: ThunkDispatch<FlashcardsAppState, FlashcardsAppDependencies, AnyAction>) => ({
-    createNewBox: () => {},
-    fetchBoxes: () => dispatch(fetchBoxes()),
-  }),
-)(BoxScreen);
+  mapStateToProps,
+  mapDispatchToProps,
+)(withImmutablePropsToJS(BoxScreen));

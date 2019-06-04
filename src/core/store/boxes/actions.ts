@@ -1,3 +1,4 @@
+import { List } from 'immutable';
 import { FlashcardsThunkAction } from '..';
 import { Box } from './types';
 
@@ -11,7 +12,7 @@ export const boxesRequestStarted = () => ({
   type: BoxesActionTypes.BOXES_REQUEST_STARTED as BoxesActionTypes.BOXES_REQUEST_STARTED,
 });
 
-export const boxesRequestSucceeded = ({ boxes }: { boxes: Box[] }) => ({
+export const boxesRequestSucceeded = ({ boxes }: { boxes: List<Box> }) => ({
   type: BoxesActionTypes.BOXES_REQUEST_SUCCEEDED as BoxesActionTypes.BOXES_REQUEST_SUCCEEDED,
   payload: {
     boxes,
@@ -29,7 +30,7 @@ export const fetchBoxes = (): FlashcardsThunkAction => async (dispatch, _, deps)
   dispatch(boxesRequestStarted());
   try {
     const boxes = await deps.fetchBoxes();
-    dispatch(boxesRequestSucceeded({ boxes }));
+    dispatch(boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
   } catch (err) {
     dispatch(boxesRequestFailed({ error: err.message }));
   }
