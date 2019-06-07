@@ -9,7 +9,7 @@ describe('When the user is logged in', () => {
     });
   });
   context('the user has some boxes', () => {
-    it('should see the list of its boxes with their respective number of flashcards and archived flashcards', () => {
+    it('should see the list of its boxes with their respective number of flashcards and archived flashcards and a button to add a new box', () => {
       const boxes = [
         {
           id: 'box1',
@@ -35,9 +35,12 @@ describe('When the user is logged in', () => {
         method: 'GET',
         url: '/boxes/',
         response: boxes,
-      });
+        delay: 200,
+      }).as('getBoxes');
       cy.visit('/');
       cy.login();
+      cy.contains('loading');
+      cy.wait('@getBoxes');
       cy.contains('Select a box');
       cy.getAllByTestId('boxName').each((el, index) => {
         expect(el.text()).equal(boxes[index].boxName);
@@ -50,6 +53,7 @@ describe('When the user is logged in', () => {
           expect(el.text()).equal(`${boxes[index].archivedFlashcards}`);
         }
       });
+      cy.getByLabelText(/create a new box/i).should('be.visible');
     });
   });
 });

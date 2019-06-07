@@ -1,25 +1,26 @@
 import React, { useEffect } from 'react';
 import { BoxList, BoxListProps } from './BoxList';
-import { BoxListEmptyState, BoxListEmptyStateProps } from './BoxListEmptyState';
+import { BoxListEmptyState } from './BoxListEmptyState';
 import { connect } from 'react-redux';
 import { FlashcardsAppState, FlashcardsAppDependencies } from './core/store';
 import { getBoxes, fetchBoxes, getBoxesRequestStatus, BoxesRequestStatusEnum } from './core/store/boxes';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 
-type BoxScreenProps = BoxListProps &
-  BoxListEmptyStateProps & {
-    fetchBoxes: () => void;
-  };
+type BoxScreenProps = BoxListProps & {
+  fetchBoxes: () => void;
+};
 
-const BoxScreen: React.FC<BoxScreenProps> = ({ boxes, boxesRequestStatus, fetchBoxes, createNewBox }) => {
+const BoxScreenDisplay: React.FC<BoxScreenProps> = ({ boxes, boxesRequestStatus, fetchBoxes }) => {
   useEffect(() => {
     if (boxesRequestStatus === BoxesRequestStatusEnum.NEVER_STARTED) {
       fetchBoxes();
     }
   });
-  return boxes.length === 0 ? (
-    <BoxListEmptyState createNewBox={createNewBox} />
+  return boxesRequestStatus === BoxesRequestStatusEnum.PENDING ? (
+    <p>loading...</p>
+  ) : boxes.length === 0 ? (
+    <BoxListEmptyState />
   ) : (
     <BoxList boxes={boxes} boxesRequestStatus={boxesRequestStatus} />
   );
@@ -37,15 +38,15 @@ const mapDispatchToProps = (
   fetchBoxes: () => dispatch(fetchBoxes()),
 });
 
-const withImmutablePropsToJS = (BoxScreen: React.FC<BoxScreenProps>) => {
+const withImmutablePropsToJS = (BoxScreenDisplay: React.FC<BoxScreenProps>) => {
   const Wrapper: React.FC<ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>> = ({
     boxes,
     ...rest
-  }) => <BoxScreen boxes={boxes.toJS()} {...rest} />;
+  }) => <BoxScreenDisplay boxes={boxes.toJS()} {...rest} />;
   return Wrapper;
 };
 
-export default connect(
+export const BoxScreen = connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withImmutablePropsToJS(BoxScreen));
+)(withImmutablePropsToJS(BoxScreenDisplay));

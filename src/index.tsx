@@ -6,6 +6,9 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { FlashcardsAppStore, createStore } from './core/store';
+import { RoutesHistoryProvider } from './router/context';
+import { RoutesHistory } from './router/context/routesHistory';
+import { Routes } from './router/state';
 
 declare global {
   interface Window {
@@ -18,9 +21,26 @@ window.FlashcardsAppStore = createStore({
   signIn: () => Promise.reject('todo'),
 });
 
+const routesHistory: RoutesHistory = {
+  getCurrentRoute() {
+    return window.location.pathname as Routes;
+  },
+  pushRoute(route) {
+    console.log('HISTORY PUSH ROUTE', route);
+    window.history.pushState(null, '', route);
+  },
+  onPopStateEvent: listener => {
+    window.onpopstate = () => {
+      listener(window.location.pathname as Routes);
+    };
+  },
+};
+
 ReactDOM.render(
   <Provider store={window.FlashcardsAppStore}>
-    <App />
+    <RoutesHistoryProvider routesHistory={routesHistory}>
+      <App />
+    </RoutesHistoryProvider>
   </Provider>,
   document.getElementById('root'),
 );

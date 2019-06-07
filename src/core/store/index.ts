@@ -5,7 +5,7 @@ import { createStore as createReduxStore, applyMiddleware, AnyAction } from 'red
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
 import { boxesReducer, BoxesState } from './boxes/reducers';
 
-const FlashcardsAppState = Record({
+export const FlashcardsAppState = Record({
   auth: AuthState(),
   boxes: BoxesState(),
 });
@@ -43,9 +43,13 @@ export type FlashcardsThunkAction = ThunkAction<
   AnyAction
 >;
 
-export const createStore = ({ fetchBoxes, signIn }: FlashcardsAppDependencies) =>
+export const createStore = (
+  { fetchBoxes, signIn }: FlashcardsAppDependencies,
+  initialState: FlashcardsAppState = FlashcardsAppState(),
+) =>
   createReduxStore(
     rootReducer,
+    initialState,
     applyMiddleware(thunk.withExtraArgument({ fetchBoxes, signIn }) as FlashcardsThunkMiddleware),
   );
 

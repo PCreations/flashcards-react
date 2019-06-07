@@ -1,5 +1,6 @@
 import React from 'react';
 import { BoxesRequestStatusEnum } from './core/store/boxes';
+import { AddBoxButton } from './AddBoxButton';
 
 type Box = {
   id: string;
@@ -33,5 +34,6 @@ export const BoxList: React.FC<BoxListProps> = ({ boxes, boxesRequestStatus, box
           </div>
         ))}
       </ol>
+      <AddBoxButton />
     </div>
   );
