@@ -13,9 +13,12 @@ declare global {
 }
 Cypress.Commands.add('login', () => {
   cy.window()
+    .its('localStorage')
+    .then(localStorage => localStorage.setItem('auth', JSON.stringify(null)));
+  cy.window()
     .its('FlashcardsAppStore')
-    .then(store => {
+    .then(async store => {
       store.subscribe(() => console.log({ state: store.getState() }));
-      store.dispatch(userAuthenticated({ userId: '42' }));
+      await store.dispatch(userAuthenticated({ userId: '42' }));
     });
 });

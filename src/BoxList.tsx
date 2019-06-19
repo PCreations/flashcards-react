@@ -1,6 +1,8 @@
 import React from 'react';
 import { BoxesRequestStatusEnum } from './core/store/boxes';
 import { AddBoxButton } from './AddBoxButton';
+import { Route } from './router';
+import { Routes } from './router/state';
 
 type Box = {
   id: string;

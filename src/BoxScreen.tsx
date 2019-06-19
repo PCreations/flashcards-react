@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
-import { BoxList, BoxListProps } from './BoxList';
-import { BoxListEmptyState } from './BoxListEmptyState';
 import { connect } from 'react-redux';
-import { FlashcardsAppState, FlashcardsAppDependencies } from './core/store';
-import { getBoxes, fetchBoxes, getBoxesRequestStatus, BoxesRequestStatusEnum } from './core/store/boxes';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import { FlashcardsAppState, FlashcardsAppDependencies } from './core/store';
+import { getBoxes, fetchBoxes, getBoxesRequestStatus, BoxesRequestStatusEnum } from './core/store/boxes';
+import { Route } from './router';
+import { Routes } from './router/state';
+import { BoxList, BoxListProps } from './BoxList';
+import { BoxListEmptyState } from './BoxListEmptyState';
+import { AddBoxForm } from './AddBoxForm';
 
 type BoxScreenProps = BoxListProps & {
   fetchBoxes: () => void;
@@ -17,12 +20,19 @@ const BoxScreenDisplay: React.FC<BoxScreenProps> = ({ boxes, boxesRequestStatus,
       fetchBoxes();
     }
   });
-  return boxesRequestStatus === BoxesRequestStatusEnum.PENDING ? (
-    <p>loading...</p>
-  ) : boxes.length === 0 ? (
-    <BoxListEmptyState />
-  ) : (
-    <BoxList boxes={boxes} boxesRequestStatus={boxesRequestStatus} />
+  return (
+    <>
+      {boxesRequestStatus === BoxesRequestStatusEnum.PENDING ? (
+        <p>loading...</p>
+      ) : boxes.length === 0 ? (
+        <BoxListEmptyState />
+      ) : (
+        <BoxList boxes={boxes} boxesRequestStatus={boxesRequestStatus} />
+      )}
+      <Route url={Routes.NEW_BOX}>
+        <AddBoxForm onSubmit={() => {}} />
+      </Route>
+    </>
   );
 };
 

@@ -26,6 +26,22 @@ describe('Route', () => {
   });
   test(`
     given a routes history where the current route is Routes.HOME
+    and a <Route url={[Routes.NEW_BOX, Routes.HOME]} /> component
+    then the component should be rendered
+  `, () => {
+    const routesHistory: RoutesHistory = {
+      getCurrentRoute() {
+        return Routes.HOME;
+      },
+      pushRoute: jest.fn(),
+      onPopStateEvent: jest.fn(),
+    };
+    const render = createRender({ routesHistory });
+    const { queryByText } = render(<Route url={[Routes.NEW_BOX, Routes.HOME]}>some text</Route>);
+    expect(queryByText('some text')).toBeInTheDocument();
+  });
+  test(`
+    given a routes history where the current route is Routes.HOME
     and a <Route url={Routes.NEW_BOX} /> component
     then the component should not be rendered
   `, () => {

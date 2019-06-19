@@ -1,21 +1,15 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { changeRoute, Routes } from './router/state';
+import { useRoutesHistoryDispatch } from './router/context';
 
-export type AddBoxButtonProps = {
-  createNewBox: () => void;
+export const AddBoxButton: React.FC = () => {
+  const dispatch = useRoutesHistoryDispatch();
+  const createNewBox = useCallback(() => {
+    return dispatch(changeRoute(Routes.NEW_BOX));
+  }, [dispatch]);
+  return (
+    <button aria-label="create a new box" onClick={createNewBox}>
+      Create a new box
+    </button>
+  );
 };
-
-const AddBoxButtonDisplay: React.FC<AddBoxButtonProps> = ({ createNewBox }) => (
-  <button aria-label="create a new box" onClick={createNewBox}>
-    Create a new box
-  </button>
-);
-
-export const AddBoxButton = connect(
-  null,
-  dispatch => ({
-    createNewBox() {
-      //todo
-    },
-  }),
-)(AddBoxButtonDisplay);

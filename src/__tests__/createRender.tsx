@@ -7,7 +7,7 @@ import { RoutesHistory } from '../router/context/routesHistory';
 import { RoutesHistoryProvider } from '../router/context';
 
 export const createRender = ({
-  deps = { signIn: jest.fn(), fetchBoxes: jest.fn() },
+  deps = { signIn: jest.fn(), fetchBoxes: jest.fn(), saveAuthData: jest.fn(), getAuthData: jest.fn() },
   routesHistory = {
     getCurrentRoute: () => Routes.HOME,
     pushRoute: jest.fn(),

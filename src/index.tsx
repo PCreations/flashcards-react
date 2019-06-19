@@ -18,7 +18,12 @@ declare global {
 
 window.FlashcardsAppStore = createStore({
   fetchBoxes: () => axios.get('/boxes/').then(response => response.data),
-  signIn: () => Promise.reject('todo'),
+  signIn: () => Promise.resolve({ userId: '42' }),
+  saveAuthData: async authData => {
+    localStorage.setItem('auth', JSON.stringify(authData));
+    return true;
+  },
+  getAuthData: async () => JSON.parse(localStorage.getItem('auth') || JSON.stringify(null)),
 });
 
 const routesHistory: RoutesHistory = {

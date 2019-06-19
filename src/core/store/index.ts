@@ -28,6 +28,8 @@ type FetchedBoxData = {
 export type FlashcardsAppDependencies = {
   fetchBoxes: () => Promise<FetchedBoxData[]>;
   signIn: () => Promise<{ userId: string }>;
+  saveAuthData: ({ userId }: { userId: string }) => Promise<boolean>;
+  getAuthData: () => Promise<{ userId: string }>;
 };
 
 export type FlashcardsThunkMiddleware = ThunkMiddleware<
@@ -44,13 +46,18 @@ export type FlashcardsThunkAction = ThunkAction<
 >;
 
 export const createStore = (
-  { fetchBoxes, signIn }: FlashcardsAppDependencies,
+  { fetchBoxes, signIn, saveAuthData, getAuthData }: FlashcardsAppDependencies,
   initialState: FlashcardsAppState = FlashcardsAppState(),
 ) =>
   createReduxStore(
     rootReducer,
     initialState,
-    applyMiddleware(thunk.withExtraArgument({ fetchBoxes, signIn }) as FlashcardsThunkMiddleware),
+    applyMiddleware(thunk.withExtraArgument({
+      fetchBoxes,
+      signIn,
+      saveAuthData,
+      getAuthData,
+    }) as FlashcardsThunkMiddleware),
   );
 
 export type FlashcardsAppStore = ReturnType<typeof createStore>;

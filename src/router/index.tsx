@@ -3,12 +3,14 @@ import { Routes, getCurrentRoute, changeRoute } from './state';
 import { useRoutesHistoryDispatch, useRoutesHistoryState } from './context';
 
 type RouteProps = {
-  url: Routes;
+  url: Routes | Routes[];
 };
 
 export const Route: React.FC<RouteProps> = ({ url, children }) => {
   const state = useRoutesHistoryState();
-  if (getCurrentRoute(state) === url) {
+  const currentRoute = getCurrentRoute(state);
+  const matchingUrl = Array.isArray(url) ? url : [url];
+  if (matchingUrl.includes(currentRoute)) {
     return <>{children}</>;
   }
   return null;
