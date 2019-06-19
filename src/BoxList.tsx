@@ -5,7 +5,6 @@ import { Route } from './router';
 import { Routes } from './router/state';
 
 type Box = {
-  id: string;
   boxName: string;
   totalFlashcards: number;
   archivedFlashcards: number;
@@ -27,7 +26,7 @@ export const BoxList: React.FC<BoxListProps> = ({ boxes, boxesRequestStatus, box
       <h1>Select a box :</h1>
       <ol>
         {boxes.map(box => (
-          <div key={box.id}>
+          <div key={box.boxName}>
             <span data-testid="boxName">{box.boxName}</span>
             <span data-testid="boxFlashcardsTotal">{box.totalFlashcards}</span>
             {box.archivedFlashcards > 0 && (

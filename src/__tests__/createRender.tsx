@@ -1,13 +1,14 @@
 import React from 'react';
 import { render } from 'react-testing-library';
 import { Provider } from 'react-redux';
-import { createStore, FlashcardsAppDependencies, FlashcardsAppState } from '../core/store';
+import { FlashcardsAppDependencies, FlashcardsAppState } from '../core/store';
 import { Routes } from '../router/state';
 import { RoutesHistory } from '../router/context/routesHistory';
 import { RoutesHistoryProvider } from '../router/context';
+import { createTestStore } from './createTestStore';
 
 export const createRender = ({
-  deps = { signIn: jest.fn(), fetchBoxes: jest.fn(), saveAuthData: jest.fn(), getAuthData: jest.fn() },
+  deps,
   routesHistory = {
     getCurrentRoute: () => Routes.HOME,
     pushRoute: jest.fn(),
@@ -19,7 +20,7 @@ export const createRender = ({
   routesHistory?: RoutesHistory;
   initialState?: FlashcardsAppState;
 }) => {
-  const store = createStore(deps, initialState);
+  const store = createTestStore(deps, initialState);
   return (ui: React.ReactElement<any>, ...rest: any) =>
     render(
       <Provider store={store}>

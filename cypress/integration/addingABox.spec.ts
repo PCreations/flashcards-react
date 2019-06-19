@@ -48,6 +48,14 @@ describe('adding a box', () => {
     cy.getByLabelText(/flashcard's question/i).type('some question');
     cy.getByLabelText(/flashcard's answer/i).type('some answer');
     cy.getByText(/submit the box/i).click();
+    cy.window()
+      .its('location')
+      .its('pathname')
+      .should('eq', '/');
+    cy.getByLabelText(/name of the box/i).should('not.be.visible');
+    cy.getByLabelText(/flashcard's question/i).should('not.be.visible');
+    cy.getByLabelText(/flashcard's answer/i).should('not.be.visible');
+    cy.getByText(/submit the box/i).should('not.be.visible');
     cy.wait('@putAddFlashcardInBox')
       .its('requestBody')
       .should('deep.equal', {
@@ -57,11 +65,6 @@ describe('adding a box', () => {
           answer: 'some answer',
         },
       });
-    cy.getByLabelText(/name of the box/i).should('not.be.visible');
-    cy.getByText(/add a first flashcard in the box/i).should('not.be.visible');
-    cy.getByLabelText(/flashcard's question/i).should('not.be.visible');
-    cy.getByLabelText(/flashcard's answer/i).should('not.be.visible');
-    cy.getByText(/submit the box/i).should('not.be.visible');
 
     cy.route({
       method: 'GET',

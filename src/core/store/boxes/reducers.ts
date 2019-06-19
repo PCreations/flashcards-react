@@ -22,7 +22,7 @@ const BoxesRequestStatus = Record<BoxesRequestStatusProps>({
 type BoxesRequestStatus = ReturnType<typeof BoxesRequestStatus>;
 
 type BoxesStateProps = {
-  data: Map<Box['id'], Box>;
+  data: Map<Box['boxName'], Box>;
   boxesRequestStatus: BoxesRequestStatus;
 };
 
@@ -46,7 +46,7 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
     case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:
       return state
         .setIn(['boxesRequestStatus', 'status'], BoxesRequestStatusEnum.SUCCEEDED)
-        .set('data', Map(action.payload.boxes.map(box => [box.id, box])));
+        .set('data', Map(action.payload.boxes.map(box => [box.boxName, box])));
     case BoxesActionTypes.BOXES_REQUEST_FAILED:
       return state.set(
         'boxesRequestStatus',

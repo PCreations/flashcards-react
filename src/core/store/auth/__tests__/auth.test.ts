@@ -1,4 +1,4 @@
-import { createStore } from '../..';
+import { createTestStore } from '../../../../__tests__/createTestStore';
 import {
   authenticateUser,
   isUserAuthenticated,
@@ -12,13 +12,8 @@ test(`
   given a non authenticated visitor
   then the isUserAuthenticated selector should return false
   and the getAuthenticationProcessStatus should return NOT_STARTED
-`, async () => {
-  const store = await createStore({
-    fetchBoxes: jest.fn(),
-    signIn: jest.fn(),
-    saveAuthData: jest.fn(),
-    getAuthData: jest.fn(),
-  });
+`, () => {
+  const store = createTestStore();
   expect(isUserAuthenticated(store.getState())).toEqual(false);
   expect(getAuthenticationProcessStatus(store.getState())).toEqual(AuthenticationProcessStatus.NOT_STARTED);
 });
@@ -33,11 +28,9 @@ test(`
   and the getAuthenticationProcessStatus should return ENDED
 `, async () => {
   const saveAuthData = jest.fn();
-  const store = await createStore({
-    fetchBoxes: jest.fn(),
+  const store = createTestStore({
     signIn: jest.fn().mockResolvedValueOnce({ userId: '42' }),
     saveAuthData,
-    getAuthData: jest.fn(),
   });
   await store.dispatch(authenticateUser());
   expect(saveAuthData).toHaveBeenNthCalledWith(1, { userId: '42' });
@@ -54,10 +47,8 @@ test(`
   and the saveUserInfo should be called with { userId: '42' }
   and the getAuthenticationProcessStatus should return ENDED
 `, async () => {
-  const store = await createStore({
-    fetchBoxes: jest.fn(),
+  const store = createTestStore({
     signIn: jest.fn().mockResolvedValueOnce({ userId: '42' }),
-    saveAuthData: jest.fn(),
     getAuthData: jest.fn().mockResolvedValueOnce({ userId: '42' }),
   });
   await store.dispatch(retrieveStoredAuthData());

@@ -12,19 +12,16 @@ describe('When the user is logged in', () => {
     it('should see the list of its boxes with their respective number of flashcards and archived flashcards and a button to add a new box', () => {
       const boxes = [
         {
-          id: 'box1',
           boxName: 'Capitals of the World',
           totalFlashcards: 50,
           archivedFlashcards: 20,
         },
         {
-          id: 'box2',
           boxName: 'Some other box',
           totalFlashcards: 40,
           archivedFlashcards: 0,
         },
         {
-          id: 'box3',
           boxName: 'Some other box 2',
           totalFlashcards: 75,
           archivedFlashcards: 50,

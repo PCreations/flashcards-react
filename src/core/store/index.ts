@@ -30,6 +30,16 @@ export type FlashcardsAppDependencies = {
   signIn: () => Promise<{ userId: string }>;
   saveAuthData: ({ userId }: { userId: string }) => Promise<boolean>;
   getAuthData: () => Promise<{ userId: string }>;
+  addFlashcardToBox: ({
+    boxName,
+    flashcard,
+  }: {
+    boxName: string;
+    flashcard: {
+      question: string;
+      answer: string;
+    };
+  }) => Promise<void>;
 };
 
 export type FlashcardsThunkMiddleware = ThunkMiddleware<
@@ -46,7 +56,7 @@ export type FlashcardsThunkAction = ThunkAction<
 >;
 
 export const createStore = (
-  { fetchBoxes, signIn, saveAuthData, getAuthData }: FlashcardsAppDependencies,
+  { fetchBoxes, signIn, saveAuthData, getAuthData, addFlashcardToBox }: FlashcardsAppDependencies,
   initialState: FlashcardsAppState = FlashcardsAppState(),
 ) =>
   createReduxStore(
@@ -57,6 +67,7 @@ export const createStore = (
       signIn,
       saveAuthData,
       getAuthData,
+      addFlashcardToBox,
     }) as FlashcardsThunkMiddleware),
   );
 
