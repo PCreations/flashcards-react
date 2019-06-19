@@ -24,6 +24,7 @@ window.FlashcardsAppStore = createStore({
     return true;
   },
   getAuthData: async () => JSON.parse(localStorage.getItem('auth') || JSON.stringify(null)),
+  addFlashcardToBox: async () => {},
 });
 
 const routesHistory: RoutesHistory = {

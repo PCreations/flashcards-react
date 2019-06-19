@@ -1,33 +1,29 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { ThunkDispatch } from 'redux-thunk';
-import { AnyAction } from 'redux';
-import { FlashcardsAppState, FlashcardsAppDependencies } from './core/store';
+import { useDispatch, useSelector } from 'react-redux';
 import { getBoxes, fetchBoxes, getBoxesRequestStatus, BoxesRequestStatusEnum } from './core/store/boxes';
 import { Route } from './router';
 import { Routes } from './router/state';
-import { BoxList, BoxListProps } from './BoxList';
+import { BoxList } from './BoxList';
 import { BoxListEmptyState } from './BoxListEmptyState';
 import { AddBoxForm } from './AddBoxForm';
 
-type BoxScreenProps = BoxListProps & {
-  fetchBoxes: () => void;
-};
-
-const BoxScreenDisplay: React.FC<BoxScreenProps> = ({ boxes, boxesRequestStatus, fetchBoxes }) => {
+export const BoxScreen: React.FC = () => {
+  const boxes = useSelector(getBoxes);
+  const boxesRequestStatus = useSelector(getBoxesRequestStatus).status;
+  const dispatch = useDispatch();
   useEffect(() => {
     if (boxesRequestStatus === BoxesRequestStatusEnum.NEVER_STARTED) {
-      fetchBoxes();
+      dispatch(fetchBoxes());
     }
-  });
+  }, [boxesRequestStatus, dispatch]);
   return (
     <>
       {boxesRequestStatus === BoxesRequestStatusEnum.PENDING ? (
         <p>loading...</p>
-      ) : boxes.length === 0 ? (
+      ) : boxes.size === 0 ? (
         <BoxListEmptyState />
       ) : (
-        <BoxList boxes={boxes} boxesRequestStatus={boxesRequestStatus} />
+        <BoxList boxes={boxes.toArray()} boxesRequestStatus={boxesRequestStatus} />
       )}
       <Route url={Routes.NEW_BOX}>
         <AddBoxForm onSubmit={() => {}} />
@@ -35,28 +31,3 @@ const BoxScreenDisplay: React.FC<BoxScreenProps> = ({ boxes, boxesRequestStatus,
     </>
   );
 };
-
-const mapStateToProps = (state: FlashcardsAppState) => ({
-  boxes: getBoxes(state),
-  boxesRequestStatus: getBoxesRequestStatus(state).status,
-});
-
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<FlashcardsAppState, FlashcardsAppDependencies, AnyAction>,
-) => ({
-  createNewBox: () => {},
-  fetchBoxes: () => dispatch(fetchBoxes()),
-});
-
-const withImmutablePropsToJS = (BoxScreenDisplay: React.FC<BoxScreenProps>) => {
-  const Wrapper: React.FC<ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>> = ({
-    boxes,
-    ...rest
-  }) => <BoxScreenDisplay boxes={boxes.toJS()} {...rest} />;
-  return Wrapper;
-};
-
-export const BoxScreen = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(withImmutablePropsToJS(BoxScreenDisplay));
