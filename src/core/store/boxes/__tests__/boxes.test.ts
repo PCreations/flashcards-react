@@ -1,8 +1,9 @@
 import { List } from 'immutable';
 import { createTestStore } from '../../../../__tests__/createTestStore';
-import { FlashcardsAppState } from '../..';
+import { FlashcardsAppState, rootReducer } from '../..';
 import { getBoxes, getBoxesRequestStatus, BoxesRequestStatusEnum, fetchBoxes, addBox } from '..';
 import { Box } from '../types';
+import { boxesRequestSucceeded } from '../actions';
 
 test(`
   given no boxes have been fetched yet
@@ -73,7 +74,7 @@ test(`
   when a addBox action is dispatched for a box named "the new box"
   then the boxes list should optimistically contain the new box with 1 total flashcards and 0 archived flashcards and an optimistic flag set to true
   and the boxes list should eventually contain the real box returned by the server
-`, () => {
+`, async () => {
   const boxes = [
     {
       boxName: 'Capitals of the World',
@@ -91,14 +92,18 @@ test(`
       archivedFlashcards: 50,
     },
   ];
-  const store = createTestStore({
-    fetchBoxes: jest.fn().mockResolvedValueOnce(boxes),
-  });
+  const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
+  const store = createTestStore(
+    {
+      fetchBoxes: jest.fn().mockResolvedValueOnce(boxes),
+    },
+    initialState,
+  );
   const updates: FlashcardsAppState[] = [];
   store.subscribe(() => updates.push(store.getState()));
-  store.dispatch(addBox({ boxName: 'the new box' }));
-  expect(getBoxes(store.getState())).toEqual([
-    ...boxes,
+  await store.dispatch(addBox({ boxName: 'the new box', flashcardAnswer: '', flashcardQuestion: '' }));
+  expect(getBoxes(updates[0]).toJS()).toEqual([
+    ...boxes.map(b => ({ ...b, optimistic: false })),
     {
       boxName: 'the new box',
       totalFlashcards: 1,

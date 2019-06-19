@@ -19,7 +19,6 @@ export const rootReducer = (state = FlashcardsAppState(), action?: any) =>
   });
 
 type FetchedBoxData = {
-  id: string;
   boxName: string;
   totalFlashcards: number;
   archivedFlashcards: number;

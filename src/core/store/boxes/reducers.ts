@@ -1,5 +1,11 @@
 import { Record, Map } from 'immutable';
-import { BoxesActionTypes, boxesRequestStarted, boxesRequestSucceeded, boxesRequestFailed } from './actions';
+import {
+  BoxesActionTypes,
+  boxesRequestStarted,
+  boxesRequestSucceeded,
+  boxesRequestFailed,
+  addBoxRequestStarted,
+} from './actions';
 import { Box } from './types';
 
 export enum BoxesRequestStatusEnum {
@@ -36,7 +42,8 @@ export type BoxesState = ReturnType<typeof BoxesState>;
 type HandledActions =
   | ReturnType<typeof boxesRequestStarted>
   | ReturnType<typeof boxesRequestSucceeded>
-  | ReturnType<typeof boxesRequestFailed>;
+  | ReturnType<typeof boxesRequestFailed>
+  | ReturnType<typeof addBoxRequestStarted>;
 
 export const boxesReducer = (state = BoxesState(), action?: HandledActions): BoxesState => {
   if (!action) return state;
@@ -54,6 +61,18 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
           status: BoxesRequestStatusEnum.FAILED,
           error: action.payload.error,
         }),
+      );
+    case BoxesActionTypes.ADD_BOX_REQUEST_STARTED:
+      return state.update('data', boxMap =>
+        boxMap.set(
+          action.payload.boxName,
+          Box({
+            boxName: action.payload.boxName,
+            archivedFlashcards: 0,
+            totalFlashcards: 1,
+            optimistic: true,
+          }),
+        ),
       );
   }
   return state;
