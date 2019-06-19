@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useCallback } from 'react';
 
 type AddBoxFormFields = {
   boxName: string;
@@ -56,13 +56,42 @@ const useAddBoxFormReducer = () => {
     boxNameValue: formState[AddBoxFormInputId.BOX_NAME],
     flashcardQuestionValue: formState[AddBoxFormInputId.FLASHCARD_QUESTION],
     flashcardAnswerValue: formState[AddBoxFormInputId.FLASHCARD_ANSWER],
-    changeBoxNameValue: (value: string) => dispatch(changeInputValue(AddBoxFormInputId.BOX_NAME, value)),
-    changeFlashcardQuestionValue: (value: string) =>
-      dispatch(changeInputValue(AddBoxFormInputId.FLASHCARD_QUESTION, value)),
-    changeFlashcardAnswerValue: (value: string) =>
-      dispatch(changeInputValue(AddBoxFormInputId.FLASHCARD_ANSWER, value)),
+    changeBoxNameValue: useCallback(
+      (value: string) => dispatch(changeInputValue(AddBoxFormInputId.BOX_NAME, value)),
+      [],
+    ),
+    changeFlashcardQuestionValue: useCallback(
+      (value: string) => dispatch(changeInputValue(AddBoxFormInputId.FLASHCARD_QUESTION, value)),
+      [],
+    ),
+    changeFlashcardAnswerValue: useCallback(
+      (value: string) => dispatch(changeInputValue(AddBoxFormInputId.FLASHCARD_ANSWER, value)),
+      [],
+    ),
   };
 };
+
+type AddBoxFormInputProps = {
+  labelText: string;
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+};
+
+const applyEventTargetValueToChangeHandler = (onChange: AddBoxFormInputProps['onChange']) => (
+  event: React.ChangeEvent<HTMLInputElement>,
+) => onChange(event.target.value);
+
+const AddBoxFormInput: React.FC<AddBoxFormInputProps> = ({ labelText, id, value, onChange }) => {
+  const onChangeHandler = useCallback(applyEventTargetValueToChangeHandler(onChange), []);
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input id={id} type="text" value={value} onChange={onChangeHandler} />
+    </>
+  );
+};
+
 export const AddBoxForm: React.FC<AddBoxFormProps> = ({ onSubmit }) => {
   const {
     boxNameValue,
@@ -83,26 +112,23 @@ export const AddBoxForm: React.FC<AddBoxFormProps> = ({ onSubmit }) => {
         });
       }}
     >
-      <label htmlFor="add-box-form-box-name-input">Name of the box</label>
-      <input
-        type="text"
-        id="add-box-form-box-name-input"
+      <AddBoxFormInput
+        labelText="Name of the box"
+        id={AddBoxFormInputId.BOX_NAME}
         value={boxNameValue}
-        onChange={e => changeBoxNameValue(e.target.value)}
+        onChange={changeBoxNameValue}
       />
-      <label htmlFor="add-box-form-flashcard-question-input">Flashcard's question</label>
-      <input
-        type="text"
-        id="add-box-form-flashcard-question-input"
+      <AddBoxFormInput
+        labelText="Flashcard's question"
+        id={AddBoxFormInputId.FLASHCARD_QUESTION}
         value={flashcardQuestionValue}
-        onChange={e => changeFlashcardQuestionValue(e.target.value)}
+        onChange={changeFlashcardQuestionValue}
       />
-      <label htmlFor="add-box-form-flashcard-answer-input">Flashcard's answer</label>
-      <input
-        type="text"
-        id="add-box-form-flashcard-answer-input"
+      <AddBoxFormInput
+        labelText="Flashcard's answer"
+        id={AddBoxFormInputId.FLASHCARD_ANSWER}
         value={flashcardAnswerValue}
-        onChange={e => changeFlashcardAnswerValue(e.target.value)}
+        onChange={changeFlashcardAnswerValue}
       />
       <button type="submit">Submit the box</button>
     </form>
