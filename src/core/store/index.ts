@@ -1,9 +1,16 @@
 import { Record } from 'immutable';
 import { authReducer } from './auth/reducers';
 import { AuthState } from './auth/reducers';
-import { createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
+import { compose, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
 import { boxesReducer, BoxesState } from './boxes/reducers';
+
+declare global {
+  interface Window {
+    FlashcardsAppStore: FlashcardsAppStore;
+    __REDUX_DEVTOOLS_EXTENSION__?: Function;
+  }
+}
 
 export const FlashcardsAppState = Record({
   auth: AuthState(),
@@ -54,6 +61,10 @@ export type FlashcardsThunkAction = ThunkAction<
   AnyAction
 >;
 
+const devtools: any = window.__REDUX_DEVTOOLS_EXTENSION__
+  ? window.__REDUX_DEVTOOLS_EXTENSION__()
+  : (f: any) => f;
+
 export const createStore = (
   { fetchBoxes, signIn, saveAuthData, getAuthData, addFlashcardToBox }: FlashcardsAppDependencies,
   initialState: FlashcardsAppState = FlashcardsAppState(),
@@ -61,13 +72,16 @@ export const createStore = (
   createReduxStore(
     rootReducer,
     initialState,
-    applyMiddleware(thunk.withExtraArgument({
-      fetchBoxes,
-      signIn,
-      saveAuthData,
-      getAuthData,
-      addFlashcardToBox,
-    }) as FlashcardsThunkMiddleware),
+    compose(
+      applyMiddleware(thunk.withExtraArgument({
+        fetchBoxes,
+        signIn,
+        saveAuthData,
+        getAuthData,
+        addFlashcardToBox,
+      }) as FlashcardsThunkMiddleware),
+      devtools,
+    ),
   );
 
 export type FlashcardsAppStore = ReturnType<typeof createStore>;

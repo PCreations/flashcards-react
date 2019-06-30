@@ -5,16 +5,10 @@ import axios from 'axios';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { FlashcardsAppStore, createStore } from './core/store';
+import { createStore } from './core/store';
 import { RoutesHistoryProvider } from './router/context';
 import { RoutesHistory } from './router/context/routesHistory';
 import { Routes } from './router/state';
-
-declare global {
-  interface Window {
-    FlashcardsAppStore: FlashcardsAppStore;
-  }
-}
 
 window.FlashcardsAppStore = createStore({
   fetchBoxes: () => axios.get('/boxes/').then(response => response.data),
@@ -24,7 +18,8 @@ window.FlashcardsAppStore = createStore({
     return true;
   },
   getAuthData: async () => JSON.parse(localStorage.getItem('auth') || JSON.stringify(null)),
-  addFlashcardToBox: async () => {},
+  addFlashcardToBox: async ({ boxName, flashcard }) =>
+    axios.put('/boxes/addFlashcardInBox/', { boxName, flashcard }).then(),
 });
 
 const routesHistory: RoutesHistory = {
@@ -32,7 +27,6 @@ const routesHistory: RoutesHistory = {
     return window.location.pathname as Routes;
   },
   pushRoute(route) {
-    console.log('HISTORY PUSH ROUTE', route);
     window.history.pushState(null, '', route);
   },
   onPopStateEvent: listener => {

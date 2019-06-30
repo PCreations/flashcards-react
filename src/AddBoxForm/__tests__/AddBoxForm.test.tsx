@@ -2,8 +2,8 @@ import React from 'react';
 import 'jest-dom/extend-expect';
 import { cleanup } from 'react-testing-library';
 import userEvent from 'user-event';
-import { AddBoxForm } from '../AddBoxForm';
-import { createRender } from './createRender';
+import { AddBoxForm } from '..';
+import { createRender } from '../../__tests__/createRender';
 import { act } from 'react-hooks-testing-library';
 
 describe('AddBoxForm', () => {
@@ -30,6 +30,30 @@ describe('AddBoxForm', () => {
       expect(flashcardQuestionInput).toHaveAttribute('value', 'this is the flashcard question input value');
       expect(flashcardAnswerInput).toHaveAttribute('value', 'this is the flashcard answer input value');
     });
+  });
+  it('should not submit the form if any of the inputs is empty and display an error', () => {
+    const render = createRender({});
+    const onSubmit = jest.fn();
+    const { getByLabelText, getByText } = render(<AddBoxForm onSubmit={onSubmit} />);
+    const nameOfBoxInput = getByLabelText(/name of the box/i);
+    const flashcardQuestionInput = getByLabelText(/flashcard's question/i);
+    const submitButton = getByText(/submit the box/i);
+    act(() => {
+      userEvent.type(nameOfBoxInput, 'My New Box');
+      userEvent.type(flashcardQuestionInput, 'Some question');
+      userEvent.click(submitButton);
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(getByText(/all fields are mandatory/i)).toBeInTheDocument();
+  });
+  it('should not display the error if the form has not been submitted once', () => {
+    const render = createRender({});
+    const { queryByText, getByLabelText } = render(<AddBoxForm onSubmit={jest.fn()} />);
+    const nameOfBoxInput = getByLabelText(/name of the box/i);
+    act(() => {
+      userEvent.type(nameOfBoxInput, 'My New Box');
+    });
+    expect(queryByText(/all fields are mandatory/i)).toBeNull();
   });
   it('calls the onSubmit props with correct values when submitting the form', () => {
     const render = createRender({});

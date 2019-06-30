@@ -1,61 +1,32 @@
+import { getTestBoxesData } from '../../src/__tests__/data/boxes';
+
 describe('adding a box', () => {
-  it('should fill the form and see the new box in the list after submitting it', () => {
-    const boxes = [
-      {
-        id: 'box1',
-        boxName: 'Capitals of the World',
-        totalFlashcards: 50,
-        archivedFlashcards: 20,
-      },
-      {
-        id: 'box2',
-        boxName: 'Some other box',
-        totalFlashcards: 40,
-        archivedFlashcards: 0,
-      },
-      {
-        id: 'box3',
-        boxName: 'Some other box 2',
-        totalFlashcards: 75,
-        archivedFlashcards: 50,
-      },
-    ];
+  /*it('should fill the form and see the new box in the list after submitting it when everything goes right on the server', () => {
+    const boxes = getTestBoxesData();
     const expectedNewBox = {
-      id: 'box4',
       boxName: 'My New Awesome Box',
       totalFlashcards: 1,
       archivedFlashcards: 0,
     };
     cy.server();
-    cy.route({
-      method: 'GET',
-      url: '/boxes/',
-      response: boxes,
-    });
+    cy.stubBoxesRequest(boxes);
     cy.route({
       method: 'PUT',
       url: '/boxes/addFlashcardInBox/',
       status: 201,
+      response: [],
     }).as('putAddFlashcardInBox');
     cy.visit('/');
     cy.login();
-    cy.getByText(/create a new box/i).click();
-    cy.window()
-      .its('location')
-      .its('pathname')
-      .should('eq', '/newBox');
-    cy.getByLabelText(/name of the box/i).type('My New Awesome Box');
-    cy.getByLabelText(/flashcard's question/i).type('some question');
-    cy.getByLabelText(/flashcard's answer/i).type('some answer');
-    cy.getByText(/submit the box/i).click();
-    cy.window()
-      .its('location')
-      .its('pathname')
-      .should('eq', '/');
-    cy.getByLabelText(/name of the box/i).should('not.be.visible');
-    cy.getByLabelText(/flashcard's question/i).should('not.be.visible');
-    cy.getByLabelText(/flashcard's answer/i).should('not.be.visible');
-    cy.getByText(/submit the box/i).should('not.be.visible');
+    cy.getByText(/^create a new box$/i).click();
+    cy.assertCurrentUrlIsNewBoxUrl();
+    cy.submitNewBoxFormWithValues({
+      boxName: 'My New Awesome Box',
+      question: 'some question',
+      answer: 'some answer',
+    });
+    cy.assertNewBoxFormIsNotVisible();
+    cy.assertCurrentUrlIsHomeUrl();
     cy.wait('@putAddFlashcardInBox')
       .its('requestBody')
       .should('deep.equal', {
@@ -65,17 +36,44 @@ describe('adding a box', () => {
           answer: 'some answer',
         },
       });
-
-    cy.route({
-      method: 'GET',
-      url: '/boxes/',
-      response: boxes.concat(expectedNewBox),
-    });
+    cy.stubBoxesRequest(boxes.concat(expectedNewBox));
     cy.getAllByTestId('boxName')
-      .first()
+      .last()
       .should('have.text', 'My New Awesome Box');
     cy.getAllByTestId('boxFlashcardsTotal')
-      .first()
+      .last()
       .should('have.text', '1');
+  });*/
+  it('should show an error message when the server sends an error', () => {
+    const boxes = getTestBoxesData();
+    cy.server();
+    cy.stubBoxesRequest(boxes);
+    cy.route({
+      method: 'PUT',
+      url: '/boxes/addFlashcardInBox/',
+      status: 500,
+      response: '',
+    }).as('putAddFlashcardInBox');
+    cy.visit('/');
+    cy.login();
+    cy.getByText(/^create a new box$/i).click();
+    cy.assertCurrentUrlIsNewBoxUrl();
+    cy.submitNewBoxFormWithValues({
+      boxName: 'My New Awesome Box',
+      question: 'some question',
+      answer: 'some answer',
+    });
+    cy.assertNewBoxFormIsNotVisible();
+    cy.assertCurrentUrlIsHomeUrl();
+    cy.getAllByTestId('boxName')
+      .last()
+      .should('have.text', 'My New Awesome Box');
+    cy.getAllByTestId('boxFlashcardsTotal')
+      .last()
+      .should('have.text', '1');
+    cy.getByRole('addBoxError').should(
+      'have.text',
+      `An error occured while creating the "My New Awesome Box" box. Please retry later`,
+    );
   });
 });

@@ -1,3 +1,3 @@
 export * from './selectors';
-export { BoxesRequestStatusEnum } from './reducers';
+export { BoxesRequestStatusEnum, AddBoxRequestStatusEnum } from './reducers';
 export { fetchBoxes, addBox } from './actions';

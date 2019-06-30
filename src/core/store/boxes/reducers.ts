@@ -5,6 +5,7 @@ import {
   boxesRequestSucceeded,
   boxesRequestFailed,
   addBoxRequestStarted,
+  addBoxRequestFailed,
 } from './actions';
 import { Box } from './types';
 
@@ -27,14 +28,34 @@ const BoxesRequestStatus = Record<BoxesRequestStatusProps>({
 
 type BoxesRequestStatus = ReturnType<typeof BoxesRequestStatus>;
 
+export enum AddBoxRequestStatusEnum {
+  NEVER_STARTED,
+  SUCCEEDED,
+  FAILED_WITH_UNKNOWN_ERROR,
+}
+
+type AddBoxRequestStatusProps = {
+  status: AddBoxRequestStatusEnum;
+  error?: string;
+};
+
+const AddBoxRequestStatus = Record<AddBoxRequestStatusProps>({
+  status: AddBoxRequestStatusEnum.NEVER_STARTED,
+  error: undefined,
+});
+
+type AddBoxRequestStatus = ReturnType<typeof AddBoxRequestStatus>;
+
 type BoxesStateProps = {
   data: Map<Box['boxName'], Box>;
   boxesRequestStatus: BoxesRequestStatus;
+  addBoxRequestStatus: AddBoxRequestStatus;
 };
 
 export const BoxesState = Record<BoxesStateProps>({
   data: Map(),
   boxesRequestStatus: BoxesRequestStatus(),
+  addBoxRequestStatus: AddBoxRequestStatus(),
 });
 
 export type BoxesState = ReturnType<typeof BoxesState>;
@@ -43,7 +64,8 @@ type HandledActions =
   | ReturnType<typeof boxesRequestStarted>
   | ReturnType<typeof boxesRequestSucceeded>
   | ReturnType<typeof boxesRequestFailed>
-  | ReturnType<typeof addBoxRequestStarted>;
+  | ReturnType<typeof addBoxRequestStarted>
+  | ReturnType<typeof addBoxRequestFailed>;
 
 export const boxesReducer = (state = BoxesState(), action?: HandledActions): BoxesState => {
   if (!action) return state;
@@ -73,6 +95,14 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
             optimistic: true,
           }),
         ),
+      );
+    case BoxesActionTypes.ADD_BOX_REQUEST_FAILED:
+      return state.set(
+        'addBoxRequestStatus',
+        AddBoxRequestStatus({
+          status: AddBoxRequestStatusEnum.FAILED_WITH_UNKNOWN_ERROR,
+          error: action.error,
+        }),
       );
   }
   return state;

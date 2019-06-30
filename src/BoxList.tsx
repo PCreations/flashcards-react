@@ -1,8 +1,6 @@
 import React from 'react';
 import { BoxesRequestStatusEnum } from './core/store/boxes';
 import { AddBoxButton } from './AddBoxButton';
-import { Route } from './router';
-import { Routes } from './router/state';
 
 type Box = {
   boxName: string;
@@ -14,15 +12,21 @@ export type BoxListProps = {
   boxes: Box[];
   boxesRequestStatus: BoxesRequestStatusEnum;
   boxesRequestError?: string;
+  addBoxRequestError?: string;
 };
 
-export const BoxList: React.FC<BoxListProps> = ({ boxes, boxesRequestStatus, boxesRequestError }) =>
+export const BoxList: React.FC<BoxListProps> = ({
+  boxes,
+  boxesRequestStatus,
+  boxesRequestError,
+  addBoxRequestError,
+}) =>
   boxesRequestStatus === BoxesRequestStatusEnum.PENDING ? (
     <div>loading...</div>
-  ) : boxesRequestStatus === BoxesRequestStatusEnum.FAILED ? (
-    <div>{boxesRequestError}</div>
   ) : (
     <div>
+      {boxesRequestStatus === BoxesRequestStatusEnum.FAILED && <div>{boxesRequestError}</div>}
+      {addBoxRequestError && <div role="addBoxError">{addBoxRequestError}</div>}
       <h1>Select a box :</h1>
       <ol>
         {boxes.map(box => (

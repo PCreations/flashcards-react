@@ -8,6 +8,7 @@ export enum BoxesActionTypes {
   BOXES_REQUEST_FAILED = '[boxes] the boxes request has failed',
   ADD_BOX_REQUEST_STARTED = '[boxes] an add box request has started',
   ADD_BOX_REQUEST_SUCCEEDED = '[boxes] an add box request has succeeded',
+  ADD_BOX_REQUEST_FAILED = '[boxes] an add box request has failed',
 }
 
 export const boxesRequestStarted = () => ({
@@ -42,6 +43,11 @@ export const addBoxRequestSucceeded = ({ boxName }: { boxName: string }) => ({
   },
 });
 
+export const addBoxRequestFailed = ({ error }: { error: string }) => ({
+  type: BoxesActionTypes.ADD_BOX_REQUEST_FAILED as BoxesActionTypes.ADD_BOX_REQUEST_FAILED,
+  error,
+});
+
 export const fetchBoxes = (): FlashcardsThunkAction => async (dispatch, _, deps) => {
   dispatch(boxesRequestStarted());
   try {
@@ -71,5 +77,11 @@ export const addBox = ({
       },
     });
     dispatch(addBoxRequestSucceeded({ boxName }));
-  } catch (err) {}
+  } catch (err) {
+    dispatch(
+      addBoxRequestFailed({
+        error: `An error occured while creating the "${boxName}" box. Please retry later`,
+      }),
+    );
+  }
 };
