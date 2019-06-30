@@ -1,7 +1,7 @@
 import { getTestBoxesData } from '../../src/__tests__/data/boxes';
 
 describe('adding a box', () => {
-  /*it('should fill the form and see the new box in the list after submitting it when everything goes right on the server', () => {
+  it('should fill the form and see the new box in the list after submitting it when everything goes right on the server', () => {
     const boxes = getTestBoxesData();
     const expectedNewBox = {
       boxName: 'My New Awesome Box',
@@ -9,7 +9,7 @@ describe('adding a box', () => {
       archivedFlashcards: 0,
     };
     cy.server();
-    cy.stubBoxesRequest(boxes);
+    cy.stubBoxesRequest(boxes, 'boxesRequest');
     cy.route({
       method: 'PUT',
       url: '/boxes/addFlashcardInBox/',
@@ -18,6 +18,7 @@ describe('adding a box', () => {
     }).as('putAddFlashcardInBox');
     cy.visit('/');
     cy.login();
+    cy.wait('@boxesRequest');
     cy.getByText(/^create a new box$/i).click();
     cy.assertCurrentUrlIsNewBoxUrl();
     cy.submitNewBoxFormWithValues({
@@ -43,11 +44,11 @@ describe('adding a box', () => {
     cy.getAllByTestId('boxFlashcardsTotal')
       .last()
       .should('have.text', '1');
-  });*/
+  });
   it('should show an error message when the server sends an error', () => {
     const boxes = getTestBoxesData();
     cy.server();
-    cy.stubBoxesRequest(boxes);
+    cy.stubBoxesRequest(boxes, 'boxesRequest');
     cy.route({
       method: 'PUT',
       url: '/boxes/addFlashcardInBox/',
@@ -56,6 +57,7 @@ describe('adding a box', () => {
     }).as('putAddFlashcardInBox');
     cy.visit('/');
     cy.login();
+    cy.wait('@boxesRequest');
     cy.getByText(/^create a new box$/i).click();
     cy.assertCurrentUrlIsNewBoxUrl();
     cy.submitNewBoxFormWithValues({
@@ -65,6 +67,7 @@ describe('adding a box', () => {
     });
     cy.assertNewBoxFormIsNotVisible();
     cy.assertCurrentUrlIsHomeUrl();
+    cy.wait('@putAddFlashcardInBox');
     cy.getAllByTestId('boxName')
       .last()
       .should('have.text', 'My New Awesome Box');

@@ -39,7 +39,7 @@ describe('BoxList', () => {
   it('should render an error if the boxes request has failed and display the locally existing boxes', () => {
     const render = createRender({});
     const expectedError = 'some error message';
-    const { container, getByText } = render(
+    const { getByRole, getByText } = render(
       <BoxList
         boxes={[
           {
@@ -52,7 +52,7 @@ describe('BoxList', () => {
         boxesRequestError={expectedError}
       />,
     );
-    expect(container).toHaveTextContent(expectedError);
+    expect(getByRole('boxesRequestError')).toHaveTextContent(expectedError);
     expect(getByText('some box locally')).toBeInTheDocument();
   });
   it('should render the addBoxRequest error if the addBoxRequest has failed', () => {

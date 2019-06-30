@@ -15,6 +15,10 @@ export type BoxListProps = {
   addBoxRequestError?: string;
 };
 
+const BoxRequestError: React.FC<{ error?: string; role: string }> = ({ error, role }) => (
+  <div role={role}>{error}</div>
+);
+
 export const BoxList: React.FC<BoxListProps> = ({
   boxes,
   boxesRequestStatus,
@@ -25,8 +29,8 @@ export const BoxList: React.FC<BoxListProps> = ({
     <div>loading...</div>
   ) : (
     <div>
-      {boxesRequestStatus === BoxesRequestStatusEnum.FAILED && <div>{boxesRequestError}</div>}
-      {addBoxRequestError && <div role="addBoxError">{addBoxRequestError}</div>}
+      {boxesRequestError && <BoxRequestError role="boxesRequestError" error={boxesRequestError} />}
+      {addBoxRequestError && <BoxRequestError role="addBoxError" error={addBoxRequestError} />}
       <h1>Select a box :</h1>
       <ol>
         {boxes.map(box => (
