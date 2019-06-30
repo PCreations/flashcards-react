@@ -79,7 +79,7 @@ test(`
   const updates: FlashcardsAppState[] = [];
   store.subscribe(() => updates.push(store.getState()));
   await store.dispatch(addBox({ boxName: 'the new box', flashcardAnswer: '', flashcardQuestion: '' }));
-  expect(getBoxes(updates[0]).toJS()).toEqual([
+  expect(getBoxes(updates[1]).toJS()).toEqual([
     ...boxes.map(b => ({ ...b, optimistic: false })),
     {
       boxName: 'the new box',
@@ -88,6 +88,10 @@ test(`
       optimistic: true,
     },
   ]);
+  expect(getAddBoxRequestStatus(updates[1]).toJS()).toEqual({
+    status: AddBoxRequestStatusEnum.SUCCEEDED,
+    error: undefined,
+  });
 });
 
 test(`
