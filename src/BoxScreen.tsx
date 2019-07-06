@@ -9,7 +9,7 @@ import {
   getAddBoxRequestStatus,
 } from './core/store/boxes';
 import { Route } from './router';
-import { Routes } from './router/state';
+import { RoutePath } from './router/state';
 import { BoxList } from './BoxList';
 import { BoxListEmptyState } from './BoxListEmptyState';
 import { AddBoxForm } from './AddBoxForm/';
@@ -37,8 +37,8 @@ export const BoxScreen: React.FC = () => {
           addBoxRequestError={addBoxRequestError}
         />
       )}
-      <Route url={Routes.NEW_BOX}>
-        <AddBoxForm onSubmit={fields => dispatch(addBox(fields))} />
+      <Route path={RoutePath.NEW_BOX}>
+        {() => <AddBoxForm onSubmit={fields => dispatch(addBox(fields))} />}
       </Route>
     </>
   );

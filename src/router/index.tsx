@@ -1,23 +1,24 @@
 import React from 'react';
-import { Routes, getCurrentRoute, changeRoute } from './state';
+import { RoutePath, matchRoute, getCurrentRoute, changeRoute } from './state';
 import { useRoutesHistoryDispatch, useRoutesHistoryState } from './context';
 
 type RouteProps = {
-  url: Routes | Routes[];
+  path: RoutePath | RoutePath[];
+  children: (params: { [key: string]: any }) => React.ReactElement;
 };
 
-export const Route: React.FC<RouteProps> = ({ url, children }) => {
+export const Route: React.FC<RouteProps> = ({ path, children }) => {
   const state = useRoutesHistoryState();
   const currentRoute = getCurrentRoute(state);
-  const matchingUrl = Array.isArray(url) ? url : [url];
-  if (matchingUrl.includes(currentRoute)) {
-    return <>{children}</>;
-  }
-  return null;
+  const pathAsArray = Array.isArray(path) ? path : [path];
+  const matchedRoutes = pathAsArray.map(path => matchRoute(currentRoute, path)).filter(Boolean) as {
+    [key: string]: any;
+  };
+  return matchedRoutes.length === 0 ? null : children(matchedRoutes[0]);
 };
 
 type RedirectProps = {
-  to: Routes;
+  to: RoutePath;
 };
 
 export const Redirect: React.FC<RedirectProps> = ({ to }) => {
@@ -25,7 +26,7 @@ export const Redirect: React.FC<RedirectProps> = ({ to }) => {
   const dispatch = useRoutesHistoryDispatch();
   const currentRoute = getCurrentRoute(state);
   if (currentRoute !== to) {
-    dispatch(changeRoute(Routes.HOME));
+    dispatch(changeRoute(to));
   }
   return null;
 };

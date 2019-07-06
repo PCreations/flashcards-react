@@ -1,7 +1,5 @@
-import { Routes } from '../state';
-
 export interface RoutesHistory {
-  getCurrentRoute: () => Routes;
-  pushRoute: (route: Routes) => void;
-  onPopStateEvent: (listener: (route: Routes) => void) => void;
+  getCurrentRoute: () => string;
+  pushRoute: (route: string) => void;
+  onPopStateEvent: (listener: (route: string) => void) => void;
 }

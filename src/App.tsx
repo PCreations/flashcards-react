@@ -13,7 +13,7 @@ import {
   AuthenticationProcessStatus,
 } from './core/store/auth';
 import { Route, Redirect } from './router';
-import { Routes } from './router/state';
+import { RoutePath } from './router/state';
 
 type AppProps = {
   hasAuthProcessEnded: boolean;
@@ -24,18 +24,14 @@ type AppProps = {
 
 const AuthenticatedApp: React.FC = () => (
   <>
-    <Route url={[Routes.HOME, Routes.NEW_BOX]}>
-      <BoxScreen />
-    </Route>
+    <Route path={[RoutePath.HOME, RoutePath.NEW_BOX]}>{() => <BoxScreen />}</Route>
   </>
 );
 
 const UnauthenticatedApp: React.FC<{ onSignInClicked: () => void }> = ({ onSignInClicked }) => (
   <>
-    <Route url={Routes.HOME}>
-      <Home onSignInClicked={onSignInClicked} />
-    </Route>
-    <Redirect to={Routes.HOME} />
+    <Route path={RoutePath.HOME}>{() => <Home onSignInClicked={onSignInClicked} />}</Route>
+    <Redirect to={RoutePath.HOME} />
   </>
 );
 

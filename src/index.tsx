@@ -8,7 +8,6 @@ import * as serviceWorker from './serviceWorker';
 import { createStore } from './core/store';
 import { RoutesHistoryProvider } from './router/context';
 import { RoutesHistory } from './router/context/routesHistory';
-import { Routes } from './router/state';
 
 window.FlashcardsAppStore = createStore({
   fetchBoxes: () => axios.get('/boxes/').then(response => response.data),
@@ -24,14 +23,14 @@ window.FlashcardsAppStore = createStore({
 
 const routesHistory: RoutesHistory = {
   getCurrentRoute() {
-    return window.location.pathname as Routes;
+    return window.location.pathname;
   },
   pushRoute(route) {
     window.history.pushState(null, '', route);
   },
   onPopStateEvent: listener => {
     window.onpopstate = () => {
-      listener(window.location.pathname as Routes);
+      listener(window.location.pathname);
     };
   },
 };

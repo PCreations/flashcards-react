@@ -1,13 +1,14 @@
-import { Record } from 'immutable';
-import { Routes } from './routes';
+import { Record, Map } from 'immutable';
 import { changeRoute, RouterActionTypes } from './actions';
 
 type RouterStateProps = {
-  currentRoute: Routes;
+  currentRoute: string;
+  currentParams: Map<string, string>;
 };
 
 export const RouterState = Record<RouterStateProps>({
-  currentRoute: Routes.HOME,
+  currentRoute: '/',
+  currentParams: Map({}),
 });
 
 export type RouterState = ReturnType<typeof RouterState>;

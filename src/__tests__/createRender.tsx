@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-testing-library';
 import { Provider } from 'react-redux';
 import { FlashcardsAppDependencies, FlashcardsAppState } from '../core/store';
-import { Routes } from '../router/state';
+import { RoutePath } from '../router/state';
 import { RoutesHistory } from '../router/context/routesHistory';
 import { RoutesHistoryProvider } from '../router/context';
 import { createTestStore } from './createTestStore';
@@ -10,7 +10,7 @@ import { createTestStore } from './createTestStore';
 export const createRender = ({
   deps,
   routesHistory = {
-    getCurrentRoute: () => Routes.HOME,
+    getCurrentRoute: () => RoutePath.HOME,
     pushRoute: jest.fn(),
     onPopStateEvent: jest.fn(),
   },

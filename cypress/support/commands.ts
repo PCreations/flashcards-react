@@ -1,7 +1,7 @@
 import 'cypress-testing-library/add-commands';
 import { FlashcardsAppStore } from '../../src/core/store';
 import { userAuthenticated } from '../../src/core/store/auth/actions';
-import { Routes } from '../../src/router/state';
+import { RoutePath, buildUrl } from '../../src/router/state';
 
 type BoxData = {
   boxName: string;
@@ -19,6 +19,7 @@ declare global {
       assertCurrentUrlIsHomeUrl: () => void;
       assertNewBoxFormIsNotVisible: () => void;
       assertAllBoxesAreInList: (boxes: BoxData[]) => void;
+      assertCurrentUrlIsBoxSessionPreviewUrl: (boxName: string) => void;
     }
   }
   interface Window {
@@ -62,14 +63,21 @@ Cypress.Commands.add('assertCurrentUrlIsNewBoxUrl', () => {
   cy.window()
     .its('location')
     .its('pathname')
-    .should('eq', Routes.NEW_BOX);
+    .should('eq', RoutePath.NEW_BOX);
 });
 
 Cypress.Commands.add('assertCurrentUrlIsHomeUrl', () => {
   cy.window()
     .its('location')
     .its('pathname')
-    .should('eq', Routes.HOME);
+    .should('eq', RoutePath.HOME);
+});
+
+Cypress.Commands.add('assertCurrentUrlIsBoxSessionPreviewUrl', boxName => {
+  cy.window()
+    .its('location')
+    .its('pathname')
+    .should('eq', buildUrl(RoutePath.SESSION_PREVIEW, { boxName }));
 });
 
 Cypress.Commands.add('assertNewBoxFormIsNotVisible', () => {

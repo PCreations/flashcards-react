@@ -3,7 +3,7 @@ import { AddBoxFormProps, AddBoxFormInputId } from './types';
 import { AddBoxFormActionTypes, invalidate, changeInputValue, submit } from './actions';
 import { addBoxFormReducer, HandledActions, initialState } from './reducer';
 import { useRoutesHistoryDispatch } from '../router/context';
-import { changeRoute, Routes } from '../router/state';
+import { changeRoute, RoutePath } from '../router/state';
 
 const isFieldValueEmpty = (inputValue: string) => inputValue === '';
 
@@ -23,7 +23,7 @@ export const useAddBoxFormReducer = (onSubmit: AddBoxFormProps['onSubmit']) => {
           baseDispatch(invalidate());
         } else {
           onSubmit(fieldValues);
-          historyDispatch(changeRoute(Routes.HOME));
+          historyDispatch(changeRoute(RoutePath.HOME));
         }
       } else {
         baseDispatch(action);
