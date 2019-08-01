@@ -3,7 +3,7 @@ import 'jest-dom/extend-expect';
 import { cleanup } from 'react-testing-library';
 import { createRender } from './createRender';
 import { BoxSessionPreview } from '../BoxSessionPreview';
-import { BoxeSessionPreviewRequestStatusEnum } from '../core/store/boxes';
+import { BoxSessionPreviewRequestStatusEnum } from '../core/store/boxes';
 
 describe('BoxSessionPreview', () => {
   afterEach(cleanup);
@@ -11,7 +11,7 @@ describe('BoxSessionPreview', () => {
     const render = createRender({});
     const { getByText } = render(
       <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxeSessionPreviewRequestStatusEnum.PENDING}
+        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.PENDING}
         box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
         numberOfFlashcardsToReview={7}
       />,
@@ -22,7 +22,7 @@ describe('BoxSessionPreview', () => {
     const render = createRender({});
     const { getByText } = render(
       <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxeSessionPreviewRequestStatusEnum.NEVER_STARTED}
+        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.NEVER_STARTED}
         box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
         numberOfFlashcardsToReview={7}
       />,
@@ -41,7 +41,7 @@ describe('BoxSessionPreview', () => {
     const render = createRender({});
     const { getByText } = render(
       <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxeSessionPreviewRequestStatusEnum.SUCCEEDED}
+        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.SUCCEEDED}
         box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
         numberOfFlashcardsToReview={7}
       />,
@@ -58,7 +58,7 @@ describe('BoxSessionPreview', () => {
     const expectedError = 'some error message';
     const { getByRole } = render(
       <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxeSessionPreviewRequestStatusEnum.FAILED}
+        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.FAILED}
         sessionPreviewRequestError={expectedError}
         box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
         numberOfFlashcardsToReview={7}

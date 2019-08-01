@@ -8,7 +8,7 @@ import {
   addBoxRequestFailed,
   addBoxRequestSucceeded,
 } from './actions';
-import { Box } from './types';
+import { Box, SessionPreview } from './types';
 
 export enum BoxesRequestStatusEnum {
   NEVER_STARTED,
@@ -47,33 +47,37 @@ const AddBoxRequestStatus = Record<AddBoxRequestStatusProps>({
 
 type AddBoxRequestStatus = ReturnType<typeof AddBoxRequestStatus>;
 
-export enum BoxeSessionPreviewRequestStatusEnum {
+export enum BoxSessionPreviewRequestStatusEnum {
   NEVER_STARTED,
   PENDING,
   SUCCEEDED,
   FAILED,
 }
 
-type BoxeSessionPreviewRequestStatusProps = {
-  status: BoxeSessionPreviewRequestStatusEnum;
+type BoxSessionPreviewRequestStatusProps = {
+  status: BoxSessionPreviewRequestStatusEnum;
   error?: string;
 };
 
-const BoxeSessionPreviewRequestStatus = Record<BoxeSessionPreviewRequestStatusProps>({
-  status: BoxeSessionPreviewRequestStatusEnum.NEVER_STARTED,
+export const BoxSessionPreviewRequestStatus = Record<BoxSessionPreviewRequestStatusProps>({
+  status: BoxSessionPreviewRequestStatusEnum.NEVER_STARTED,
   error: undefined,
 });
 
-type BoxeSessionPreviewRequestStatus = ReturnType<typeof BoxeSessionPreviewRequestStatus>;
+export type BoxSessionPreviewRequestStatus = ReturnType<typeof BoxSessionPreviewRequestStatus>;
 
 type BoxesStateProps = {
   data: Map<Box['boxName'], Box>;
+  sessions: Map<Box['boxName'], SessionPreview>;
+  sessionsPreviewRequests: Map<Box['boxName'], BoxSessionPreviewRequestStatus>;
   boxesRequestStatus: BoxesRequestStatus;
   addBoxRequestStatus: AddBoxRequestStatus;
 };
 
 export const BoxesState = Record<BoxesStateProps>({
   data: Map(),
+  sessions: Map(),
+  sessionsPreviewRequests: Map(),
   boxesRequestStatus: BoxesRequestStatus(),
   addBoxRequestStatus: AddBoxRequestStatus(),
 });
@@ -96,7 +100,24 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
     case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:
       return state
         .setIn(['boxesRequestStatus', 'status'], BoxesRequestStatusEnum.SUCCEEDED)
-        .set('data', Map(action.payload.boxes.map(box => [box.boxName, box])));
+        .set('data', Map(action.payload.boxes.map(box => [box.boxName, box])))
+        .set(
+          'sessions',
+          Map(
+            action.payload.boxes.map(box => [
+              box.boxName,
+              SessionPreview({
+                boxName: box.boxName,
+                totalFlashcards: box.totalFlashcards,
+                archivedFlashcards: box.archivedFlashcards,
+              }),
+            ]),
+          ),
+        )
+        .set(
+          'sessionsPreviewRequests',
+          Map(action.payload.boxes.map(box => [box.boxName, BoxSessionPreviewRequestStatus()])),
+        );
     case BoxesActionTypes.BOXES_REQUEST_FAILED:
       return state.set(
         'boxesRequestStatus',

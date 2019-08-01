@@ -1,8 +1,8 @@
 import React from 'react';
-import { BoxeSessionPreviewRequestStatusEnum } from './core/store/boxes';
+import { BoxSessionPreviewRequestStatusEnum } from './core/store/boxes';
 
 type BoxSessionPreviewProps = {
-  sessionPreviewRequestStatus: BoxeSessionPreviewRequestStatusEnum;
+  sessionPreviewRequestStatus: BoxSessionPreviewRequestStatusEnum;
   sessionPreviewRequestError?: string;
   box: { name: string; totalFlashcards: number; archivedFlashcards: number };
   numberOfFlashcardsToReview: number;
@@ -15,12 +15,12 @@ export const BoxSessionPreview: React.FC<BoxSessionPreviewProps> = ({
   numberOfFlashcardsToReview,
 }) => {
   if (
-    sessionPreviewRequestStatus === BoxeSessionPreviewRequestStatusEnum.PENDING ||
-    sessionPreviewRequestStatus === BoxeSessionPreviewRequestStatusEnum.NEVER_STARTED
+    sessionPreviewRequestStatus === BoxSessionPreviewRequestStatusEnum.PENDING ||
+    sessionPreviewRequestStatus === BoxSessionPreviewRequestStatusEnum.NEVER_STARTED
   ) {
     return <>loading</>;
   }
-  if (sessionPreviewRequestStatus === BoxeSessionPreviewRequestStatusEnum.FAILED) {
+  if (sessionPreviewRequestStatus === BoxSessionPreviewRequestStatusEnum.FAILED) {
     return <div role="sessionPreviewError">{sessionPreviewRequestError}</div>;
   }
   return (
