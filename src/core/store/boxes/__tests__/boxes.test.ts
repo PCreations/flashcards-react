@@ -13,8 +13,8 @@ import {
   getBoxSessionPreviewRequestStatus,
 } from '..';
 import { Box, SessionPreview } from '../types';
-import { boxesRequestSucceeded } from '../actions';
-import { AddBoxRequestStatusEnum } from '../reducers';
+import { boxesRequestSucceeded, fetchSessionPreview } from '../actions';
+import { AddBoxRequestStatusEnum, BoxSessionPreviewRequestStatusEnum } from '../reducers';
 
 describe('fetching boxes', () => {
   test(`
@@ -174,11 +174,66 @@ describe('fetching session preview', () => {
     );
   });
 
-  test.todo(`
-  given the session preview for the box box42 has not been fetched
+  test(`
+  given some boxes have been fetched
+  abd the session preview for the box box42 has not been fetched
   when a fetchSessionPreview action is dispatched
   then the boxSessionPreviewRequestStatus selector should return PENDING on the first state update
   then the getSessionPreview selector should return the correct session preview
   and the getBoxSessionPreviewRequestStatus selector should return SUCCEED on the last state update
-  `);
+  `, async () => {
+    const boxes = getTestBoxesData();
+    const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
+    const store = createTestStore(
+      {
+        fetchSessionPreview: jest.fn().mockResolvedValueOnce({
+          boxName: boxes[0].boxName,
+          totalFlashcards: boxes[0].totalFlashcards,
+          archivedFlashcards: boxes[0].archivedFlashcards,
+          flashcardsToReview: 7,
+        }),
+      },
+      initialState,
+    );
+    const updates: FlashcardsAppState[] = [];
+    store.subscribe(() => updates.push(store.getState()));
+    await store.dispatch(fetchSessionPreview({ boxName: boxes[0].boxName }));
+    expect(getBoxSessionPreviewRequestStatus(boxes[0].boxName, updates[0]).status).toEqual(
+      BoxSessionPreviewRequestStatusEnum.PENDING,
+    );
+    expect(getSessionPreview(boxes[0].boxName, updates[1])).toEqual(
+      SessionPreview({
+        boxName: boxes[0].boxName,
+        totalFlashcards: boxes[0].totalFlashcards,
+        archivedFlashcards: boxes[0].archivedFlashcards,
+        flashcardsToReview: 7,
+      }),
+    );
+    expect(getBoxSessionPreviewRequestStatus(boxes[0].boxName, updates[1]).status).toEqual(
+      BoxSessionPreviewRequestStatusEnum.SUCCEEDED,
+    );
+  });
+
+  test(`
+  given some boxes have been fetched
+  and the session preview for the box box42 has not been fetched
+  and the fetchSessionPreview request eventually throws an error
+  when a fetchSessionPreview action is dispatched
+  then the getBoxSessionPreviewRequestStatus selector should indicate that something got wrong, with the thrown error's message
+`, async () => {
+    const boxes = getTestBoxesData();
+    const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
+    const someError = new Error('some error');
+    const store = createTestStore(
+      {
+        fetchSessionPreview: jest.fn().mockRejectedValueOnce(someError),
+      },
+      initialState,
+    );
+    await store.dispatch(fetchSessionPreview({ boxName: boxes[0].boxName }));
+    expect(getBoxSessionPreviewRequestStatus(boxes[0].boxName, store.getState()).toJS()).toEqual({
+      status: BoxSessionPreviewRequestStatusEnum.FAILED,
+      error: 'some error',
+    });
+  });
 });

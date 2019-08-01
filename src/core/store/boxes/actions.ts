@@ -1,6 +1,6 @@
 import { List } from 'immutable';
 import { FlashcardsThunkAction } from '..';
-import { Box } from './types';
+import { Box, SessionPreview } from './types';
 
 export enum BoxesActionTypes {
   BOXES_REQUEST_STARTED = '[boxes] the boxes request has started',
@@ -9,6 +9,9 @@ export enum BoxesActionTypes {
   ADD_BOX_REQUEST_STARTED = '[boxes] an add box request has started',
   ADD_BOX_REQUEST_SUCCEEDED = '[boxes] an add box request has succeeded',
   ADD_BOX_REQUEST_FAILED = '[boxes] an add box request has failed',
+  BOX_SESSION_PREVIEW_REQUEST_STARTED = '[boxes] a box session preview request has started',
+  BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED = '[boxes] a box session preview request has succeeded',
+  BOX_SESSION_PREVIEW_REQUEST_FAILED = '[boxes] a box session preview request has failed',
 }
 
 export const boxesRequestStarted = () => ({
@@ -48,6 +51,32 @@ export const addBoxRequestFailed = ({ error }: { error: string }) => ({
   error,
 });
 
+export const boxSessionPreviewRequestStarted = ({ boxName }: { boxName: string }) => ({
+  type: BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_STARTED as BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_STARTED,
+  payload: {
+    boxName,
+  },
+});
+
+export const boxSessionPreviewRequestSucceeded = ({
+  sessionPreview,
+}: {
+  sessionPreview: SessionPreview;
+}) => ({
+  type: BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED as BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED,
+  payload: {
+    sessionPreview,
+  },
+});
+
+export const boxSessionPreviewRequestFailed = ({ boxName, error }: { boxName: string; error: string }) => ({
+  type: BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_FAILED as BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_FAILED,
+  payload: {
+    boxName,
+    error,
+  },
+});
+
 export const fetchBoxes = (): FlashcardsThunkAction => async (dispatch, _, deps) => {
   dispatch(boxesRequestStarted());
   try {
@@ -83,5 +112,19 @@ export const addBox = ({
         error: `An error occured while creating the "${boxName}" box. Please retry later`,
       }),
     );
+  }
+};
+
+export const fetchSessionPreview = ({ boxName }: { boxName: string }): FlashcardsThunkAction => async (
+  dispatch,
+  _,
+  deps,
+) => {
+  dispatch(boxSessionPreviewRequestStarted({ boxName }));
+  try {
+    const sessionPreview = await deps.fetchSessionPreview({ boxName });
+    dispatch(boxSessionPreviewRequestSucceeded({ sessionPreview }));
+  } catch (err) {
+    dispatch(boxSessionPreviewRequestFailed({ boxName, error: err.message }));
   }
 };

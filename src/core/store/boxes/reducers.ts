@@ -7,6 +7,9 @@ import {
   addBoxRequestStarted,
   addBoxRequestFailed,
   addBoxRequestSucceeded,
+  boxSessionPreviewRequestStarted,
+  boxSessionPreviewRequestSucceeded,
+  boxSessionPreviewRequestFailed,
 } from './actions';
 import { Box, SessionPreview } from './types';
 
@@ -90,7 +93,10 @@ type HandledActions =
   | ReturnType<typeof boxesRequestFailed>
   | ReturnType<typeof addBoxRequestStarted>
   | ReturnType<typeof addBoxRequestFailed>
-  | ReturnType<typeof addBoxRequestSucceeded>;
+  | ReturnType<typeof addBoxRequestSucceeded>
+  | ReturnType<typeof boxSessionPreviewRequestStarted>
+  | ReturnType<typeof boxSessionPreviewRequestSucceeded>
+  | ReturnType<typeof boxSessionPreviewRequestFailed>;
 
 export const boxesReducer = (state = BoxesState(), action?: HandledActions): BoxesState => {
   if (!action) return state;
@@ -152,6 +158,29 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
         AddBoxRequestStatus({
           status: AddBoxRequestStatusEnum.FAILED_WITH_UNKNOWN_ERROR,
           error: action.error,
+        }),
+      );
+    case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_STARTED:
+      return state.updateIn(['sessionsPreviewRequests', action.payload.boxName], boxSessionPreviewRequest =>
+        boxSessionPreviewRequest.set('status', BoxSessionPreviewRequestStatusEnum.PENDING),
+      );
+    case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED:
+      return state
+        .updateIn(
+          ['sessionsPreviewRequests', action.payload.sessionPreview.boxName],
+          boxSessionPreviewRequest =>
+            boxSessionPreviewRequest.set('status', BoxSessionPreviewRequestStatusEnum.SUCCEEDED),
+        )
+        .setIn(
+          ['sessions', action.payload.sessionPreview.boxName],
+          SessionPreview(action.payload.sessionPreview),
+        );
+    case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_FAILED:
+      return state.setIn(
+        ['sessionsPreviewRequests', action.payload.boxName],
+        BoxSessionPreviewRequestStatus({
+          status: BoxSessionPreviewRequestStatusEnum.FAILED,
+          error: action.payload.error,
         }),
       );
   }

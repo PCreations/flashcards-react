@@ -4,6 +4,7 @@ import { AuthState } from './auth/reducers';
 import { compose, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
 import { boxesReducer, BoxesState } from './boxes/reducers';
+import { SessionPreview } from './boxes/types';
 
 declare global {
   interface Window {
@@ -33,6 +34,7 @@ type FetchedBoxData = {
 
 export type FlashcardsAppDependencies = {
   fetchBoxes: () => Promise<FetchedBoxData[]>;
+  fetchSessionPreview: ({ boxName }: { boxName: string }) => Promise<SessionPreview>;
   signIn: () => Promise<{ userId: string }>;
   saveAuthData: ({ userId }: { userId: string }) => Promise<boolean>;
   getAuthData: () => Promise<{ userId: string }>;
@@ -66,7 +68,14 @@ const devtools: any = window.__REDUX_DEVTOOLS_EXTENSION__
   : (f: any) => f;
 
 export const createStore = (
-  { fetchBoxes, signIn, saveAuthData, getAuthData, addFlashcardToBox }: FlashcardsAppDependencies,
+  {
+    fetchBoxes,
+    fetchSessionPreview,
+    signIn,
+    saveAuthData,
+    getAuthData,
+    addFlashcardToBox,
+  }: FlashcardsAppDependencies,
   initialState: FlashcardsAppState = FlashcardsAppState(),
 ) =>
   createReduxStore(
@@ -75,6 +84,7 @@ export const createStore = (
     compose(
       applyMiddleware(thunk.withExtraArgument({
         fetchBoxes,
+        fetchSessionPreview,
         signIn,
         saveAuthData,
         getAuthData,
