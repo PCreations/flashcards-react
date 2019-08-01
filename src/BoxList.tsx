@@ -1,6 +1,8 @@
 import React from 'react';
 import { BoxesRequestStatusEnum } from './core/store/boxes';
 import { AddBoxButton } from './AddBoxButton';
+import { buildUrl, RoutePath } from './router/state';
+import { Link } from './router';
 
 type Box = {
   boxName: string;
@@ -35,7 +37,12 @@ export const BoxList: React.FC<BoxListProps> = ({
       <ol>
         {boxes.map(box => (
           <div key={box.boxName}>
-            <span data-testid="boxName">{box.boxName}</span>
+            <Link
+              title="Box session preview"
+              to={buildUrl(RoutePath.SESSION_PREVIEW, { boxName: box.boxName }) || ''}
+            >
+              {box.boxName}
+            </Link>
             <span data-testid="boxFlashcardsTotal">{box.totalFlashcards}</span>
             {box.archivedFlashcards > 0 && (
               <span data-testid="boxArchivedFlashcards">{box.archivedFlashcards}</span>

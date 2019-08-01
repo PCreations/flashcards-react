@@ -38,13 +38,14 @@ describe('adding a box', () => {
         },
       });
     cy.stubBoxesRequest(boxes.concat(expectedNewBox));
-    cy.getAllByTestId('boxName')
+    cy.getAllByTitle('Box session preview')
       .last()
       .should('have.text', 'My New Awesome Box');
     cy.getAllByTestId('boxFlashcardsTotal')
       .last()
       .should('have.text', '1');
   });
+
   it('should show an error message when the server sends an error', () => {
     const boxes = getTestBoxesData();
     cy.server();
@@ -68,7 +69,7 @@ describe('adding a box', () => {
     cy.assertNewBoxFormIsNotVisible();
     cy.assertCurrentUrlIsHomeUrl();
     cy.wait('@putAddFlashcardInBox');
-    cy.getAllByTestId('boxName')
+    cy.getAllByTitle('Box session preview')
       .last()
       .should('have.text', 'My New Awesome Box');
     cy.getAllByTestId('boxFlashcardsTotal')

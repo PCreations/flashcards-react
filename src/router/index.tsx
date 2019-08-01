@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { RoutePath, matchRoute, getCurrentRoute, changeRoute } from './state';
 import { useRoutesHistoryDispatch, useRoutesHistoryState } from './context';
 
@@ -29,4 +29,25 @@ export const Redirect: React.FC<RedirectProps> = ({ to }) => {
     dispatch(changeRoute(to));
   }
   return null;
+};
+
+type LinkProps = {
+  title: string;
+  to: string;
+};
+
+export const Link: React.FC<LinkProps> = ({ title, to, children }) => {
+  const dispatch = useRoutesHistoryDispatch();
+  const onClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      event.preventDefault();
+      dispatch(changeRoute(to));
+    },
+    [dispatch, to],
+  );
+  return (
+    <a title={title} onClick={onClick}>
+      {children}
+    </a>
+  );
 };

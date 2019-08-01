@@ -24,10 +24,10 @@ describe('BoxList', () => {
   it('should render the given boxes and a button to add new box', () => {
     const render = createRender({});
     const boxes = getTestBoxesData();
-    const { getAllByTestId, getByLabelText } = render(
+    const { getAllByTestId, getByText, getByLabelText } = render(
       <BoxList boxes={boxes} boxesRequestStatus={BoxesRequestStatusEnum.SUCCEEDED} />,
     );
-    expect(getAllByTestId('boxName').map(e => e.textContent)).toEqual(boxes.map(b => b.boxName));
+    boxes.map(b => expect(getByText(b.boxName)).toBeInTheDocument());
     expect(getAllByTestId('boxFlashcardsTotal').map(e => e.textContent)).toEqual(
       boxes.map(b => `${b.totalFlashcards}`),
     );

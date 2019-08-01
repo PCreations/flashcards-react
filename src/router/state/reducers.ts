@@ -1,5 +1,6 @@
 import { Record, Map } from 'immutable';
 import { changeRoute, RouterActionTypes } from './actions';
+import { RoutePath } from '.';
 
 type RouterStateProps = {
   currentRoute: string;
@@ -7,7 +8,7 @@ type RouterStateProps = {
 };
 
 export const RouterState = Record<RouterStateProps>({
-  currentRoute: '/',
+  currentRoute: RoutePath.HOME,
   currentParams: Map({}),
 });
 

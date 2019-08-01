@@ -47,6 +47,25 @@ const AddBoxRequestStatus = Record<AddBoxRequestStatusProps>({
 
 type AddBoxRequestStatus = ReturnType<typeof AddBoxRequestStatus>;
 
+export enum BoxeSessionPreviewRequestStatusEnum {
+  NEVER_STARTED,
+  PENDING,
+  SUCCEEDED,
+  FAILED,
+}
+
+type BoxeSessionPreviewRequestStatusProps = {
+  status: BoxeSessionPreviewRequestStatusEnum;
+  error?: string;
+};
+
+const BoxeSessionPreviewRequestStatus = Record<BoxeSessionPreviewRequestStatusProps>({
+  status: BoxeSessionPreviewRequestStatusEnum.NEVER_STARTED,
+  error: undefined,
+});
+
+type BoxeSessionPreviewRequestStatus = ReturnType<typeof BoxeSessionPreviewRequestStatus>;
+
 type BoxesStateProps = {
   data: Map<Box['boxName'], Box>;
   boxesRequestStatus: BoxesRequestStatus;

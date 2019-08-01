@@ -88,7 +88,7 @@ Cypress.Commands.add('assertNewBoxFormIsNotVisible', () => {
 });
 
 Cypress.Commands.add('assertAllBoxesAreInList', (boxes: BoxData[]) => {
-  cy.getAllByTestId('boxName').each((el, index) => {
+  cy.getAllByTitle('Box session preview').each((el, index) => {
     expect(el.text()).equal(boxes[index].boxName);
   });
   cy.getAllByTestId('boxFlashcardsTotal').each((el, index) => {

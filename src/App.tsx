@@ -25,6 +25,7 @@ type AppProps = {
 const AuthenticatedApp: React.FC = () => (
   <>
     <Route path={[RoutePath.HOME, RoutePath.NEW_BOX]}>{() => <BoxScreen />}</Route>
+    <Route path={RoutePath.SESSION_PREVIEW}>{({ boxName }) => <>{boxName}</>}</Route>
   </>
 );
 
