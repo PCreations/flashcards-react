@@ -11,6 +11,14 @@ import { RoutesHistory } from './router/context/routesHistory';
 
 window.FlashcardsAppStore = createStore({
   fetchBoxes: () => axios.get('/boxes/').then(response => response.data),
+  fetchSessionPreview: ({ boxName }) =>
+    axios
+      .get('/boxes/sessionPreview', {
+        params: {
+          boxName,
+        },
+      })
+      .then(response => response.data),
   signIn: () => Promise.resolve({ userId: '42' }),
   saveAuthData: async authData => {
     localStorage.setItem('auth', JSON.stringify(authData));

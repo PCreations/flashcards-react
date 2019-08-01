@@ -14,6 +14,7 @@ import {
 } from './core/store/auth';
 import { Route, Redirect } from './router';
 import { RoutePath } from './router/state';
+import { BoxSessionScreen } from './BoxSessionScreen';
 
 type AppProps = {
   hasAuthProcessEnded: boolean;
@@ -25,7 +26,7 @@ type AppProps = {
 const AuthenticatedApp: React.FC = () => (
   <>
     <Route path={[RoutePath.HOME, RoutePath.NEW_BOX]}>{() => <BoxScreen />}</Route>
-    <Route path={RoutePath.SESSION_PREVIEW}>{({ boxName }) => <>{boxName}</>}</Route>
+    <Route path={RoutePath.SESSION_PREVIEW}>{({ boxName }) => <BoxSessionScreen boxName={boxName} />}</Route>
   </>
 );
 
