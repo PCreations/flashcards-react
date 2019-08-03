@@ -3,6 +3,7 @@ import { createStore, FlashcardsAppDependencies, FlashcardsAppState } from '../c
 const defaultDeps: FlashcardsAppDependencies = {
   signIn: jest.fn(),
   fetchBoxes: jest.fn(),
+  fetchSessionPreview: jest.fn(),
   saveAuthData: jest.fn(),
   getAuthData: jest.fn(),
   addFlashcardToBox: jest.fn(),

@@ -3,7 +3,7 @@ import { authReducer } from './auth/reducers';
 import { AuthState } from './auth/reducers';
 import { compose, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
-import { boxesReducer, BoxesState } from './boxes/reducers';
+import { reducer as boxesReducer, BoxesState } from './boxes/reducers';
 import { FetchedBoxData, FetchedSessionPreviewData } from './boxes/types';
 
 declare global {
