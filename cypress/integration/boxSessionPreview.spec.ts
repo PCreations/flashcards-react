@@ -7,7 +7,7 @@ it('should see a box session preview when clicking on a box in the boxes screen'
   cy.stubBoxesRequest(boxes, 'boxesRequest');
   cy.route({
     method: 'GET',
-    url: `/boxes/sessionPreview?boxName=toto`,
+    url: `/boxes/sessionPreview?boxName=${boxes[0].boxName.replace(/\s/g, '+')}`,
     status: 200,
     response: {
       ...boxes[0],

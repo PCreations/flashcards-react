@@ -96,7 +96,7 @@ describe('createRequestStatusManager', () => {
         expectedErrorMessage,
       );
     });
-    test(`
+    /*test(`
       given a requestStatusManager
       when creating a requestFetcher that resolves to { foo: 'data' } and emits an fooDataReceived action
       and resolving the fetcher
@@ -140,7 +140,7 @@ describe('createRequestStatusManager', () => {
       expect(requestStatusManager.getRequestStatus(requestId, store.getState().bar).status).toBe(
         RequestStatusEnum.SUCCEEDED,
       );
-    });
+    });*/
   });
   describe('handling multiple request status manager', () => {
     test(`

@@ -237,7 +237,7 @@ describe('fetching session preview', () => {
     });
   });
 
-  xtest(`
+  test(`
   given some boxes have been fetched
   and a new box has just been added
   when a fetchSessionPreview action is dispatched for this new box
@@ -255,7 +255,7 @@ describe('fetching session preview', () => {
     const store = createTestStore(
       {
         fetchSessionPreview: jest.fn().mockResolvedValueOnce({
-          ...theNewBox,
+          ...theNewBox.toJS(),
           flashcardsToReview: 1,
         }),
       },
@@ -268,7 +268,7 @@ describe('fetching session preview', () => {
     expect(getBoxSessionPreviewRequestStatus(theNewBox.boxName, updates[0]).status).toEqual(
       BoxSessionPreviewRequestStatusEnum.PENDING,
     );
-    expect(getSessionPreview(theNewBox.boxName, updates[1])).toEqual(
+    expect(getSessionPreview(theNewBox.boxName, store.getState())).toEqual(
       SessionPreview({
         boxName: theNewBox.boxName,
         totalFlashcards: theNewBox.totalFlashcards,
@@ -276,7 +276,7 @@ describe('fetching session preview', () => {
         flashcardsToReview: 1,
       }),
     );
-    expect(getBoxSessionPreviewRequestStatus(theNewBox.boxName, updates[1]).status).toEqual(
+    expect(getBoxSessionPreviewRequestStatus(theNewBox.boxName, store.getState()).status).toEqual(
       BoxSessionPreviewRequestStatusEnum.SUCCEEDED,
     );
   });

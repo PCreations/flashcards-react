@@ -16,6 +16,34 @@ export const Box = Record<BoxProps>({
 
 export type Box = ReturnType<typeof Box>;
 
+export type FetchedBoxData = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+};
+
+export type FetchedSessionPreviewData = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+  flashcardsToReview: number;
+};
+
+type SessionProps = {
+  boxName: string;
+  flashcardsToReview: number;
+};
+
+export const Session = Record<SessionProps>({
+  boxName: '',
+  flashcardsToReview: 0,
+});
+
+export type Session = {
+  boxName: string;
+  flashcardsToReview: number;
+};
+
 type SessionPreviewProps = {
   boxName: string;
   totalFlashcards: number;
@@ -30,4 +58,9 @@ export const SessionPreview = Record<SessionPreviewProps>({
   flashcardsToReview: 0,
 });
 
-export type SessionPreview = ReturnType<typeof SessionPreview>;
+export type SessionPreview = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+  flashcardsToReview: number;
+};

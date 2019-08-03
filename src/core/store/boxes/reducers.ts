@@ -11,7 +11,7 @@ import {
   boxSessionPreviewRequestSucceeded,
   boxSessionPreviewRequestFailed,
 } from './actions';
-import { Box, SessionPreview } from './types';
+import { Box, Session } from './types';
 
 export enum BoxesRequestStatusEnum {
   NEVER_STARTED,
@@ -71,7 +71,7 @@ export type BoxSessionPreviewRequestStatus = ReturnType<typeof BoxSessionPreview
 
 type BoxesStateProps = {
   data: Map<Box['boxName'], Box>;
-  sessions: Map<Box['boxName'], SessionPreview>;
+  sessions: Map<Box['boxName'], Session>;
   sessionsPreviewRequests: Map<Box['boxName'], BoxSessionPreviewRequestStatus>;
   boxesRequestStatus: BoxesRequestStatus;
   addBoxRequestStatus: AddBoxRequestStatus;
@@ -107,19 +107,6 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
       return state
         .setIn(['boxesRequestStatus', 'status'], BoxesRequestStatusEnum.SUCCEEDED)
         .set('data', Map(action.payload.boxes.map(box => [box.boxName, box])))
-        .set(
-          'sessions',
-          Map(
-            action.payload.boxes.map(box => [
-              box.boxName,
-              SessionPreview({
-                boxName: box.boxName,
-                totalFlashcards: box.totalFlashcards,
-                archivedFlashcards: box.archivedFlashcards,
-              }),
-            ]),
-          ),
-        )
         .set(
           'sessionsPreviewRequests',
           Map(action.payload.boxes.map(box => [box.boxName, BoxSessionPreviewRequestStatus()])),
@@ -180,7 +167,10 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
         )
         .setIn(
           ['sessions', action.payload.sessionPreview.boxName],
-          SessionPreview(action.payload.sessionPreview),
+          Session({
+            boxName: action.payload.sessionPreview.boxName,
+            flashcardsToReview: action.payload.sessionPreview.flashcardsToReview,
+          }),
         );
     case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_FAILED:
       return state.setIn(
