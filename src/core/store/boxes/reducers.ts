@@ -98,88 +98,119 @@ type HandledActions =
   | ReturnType<typeof boxSessionPreviewRequestSucceeded>
   | ReturnType<typeof boxSessionPreviewRequestFailed>;
 
-export const boxesReducer = (state = BoxesState(), action?: HandledActions): BoxesState => {
-  if (!action) return state;
+const dataReducer = (data: BoxesState['data'], action?: HandledActions): BoxesState['data'] => {
+  if (!action) return data;
   switch (action.type) {
-    case BoxesActionTypes.BOXES_REQUEST_STARTED:
-      return state.setIn(['boxesRequestStatus', 'status'], BoxesRequestStatusEnum.PENDING);
     case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:
-      return state
-        .setIn(['boxesRequestStatus', 'status'], BoxesRequestStatusEnum.SUCCEEDED)
-        .set('data', Map(action.payload.boxes.map(box => [box.boxName, box])))
-        .set(
-          'sessionsPreviewRequests',
-          Map(action.payload.boxes.map(box => [box.boxName, BoxSessionPreviewRequestStatus()])),
-        );
-    case BoxesActionTypes.BOXES_REQUEST_FAILED:
-      return state.set(
-        'boxesRequestStatus',
-        BoxesRequestStatus({
-          status: BoxesRequestStatusEnum.FAILED,
-          error: action.payload.error,
-        }),
-      );
+      return Map(action.payload.boxes.map(box => [box.boxName, box]));
     case BoxesActionTypes.ADD_BOX_REQUEST_STARTED:
-      return state
-        .update('data', boxMap =>
-          boxMap.set(
-            action.payload.boxName,
-            Box({
-              boxName: action.payload.boxName,
-              archivedFlashcards: 0,
-              totalFlashcards: 1,
-              optimistic: true,
-            }),
-          ),
-        )
-        .setIn(
-          ['sessionsPreviewRequests', action.payload.boxName],
-          BoxSessionPreviewRequestStatus({
-            status: BoxSessionPreviewRequestStatusEnum.NEVER_STARTED,
-          }),
-        );
-    case BoxesActionTypes.ADD_BOX_REQUEST_SUCCEEDED:
-      return state.set(
-        'addBoxRequestStatus',
-        AddBoxRequestStatus({
-          status: AddBoxRequestStatusEnum.SUCCEEDED,
-          error: undefined,
+      return data.set(
+        action.payload.boxName,
+        Box({
+          boxName: action.payload.boxName,
+          archivedFlashcards: 0,
+          totalFlashcards: 1,
+          optimistic: true,
         }),
       );
-    case BoxesActionTypes.ADD_BOX_REQUEST_FAILED:
-      return state.set(
-        'addBoxRequestStatus',
-        AddBoxRequestStatus({
-          status: AddBoxRequestStatusEnum.FAILED_WITH_UNKNOWN_ERROR,
-          error: action.error,
+  }
+  return data;
+};
+
+const sessionsReducer = (
+  sessions: BoxesState['sessions'],
+  action?: HandledActions,
+): BoxesState['sessions'] => {
+  if (!action) return sessions;
+  switch (action.type) {
+    case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED:
+      return sessions.set(
+        action.payload.sessionPreview.boxName,
+        Session({
+          boxName: action.payload.sessionPreview.boxName,
+          flashcardsToReview: action.payload.sessionPreview.flashcardsToReview,
+        }),
+      );
+  }
+  return sessions;
+};
+
+const sessionsPreviewRequestsReducer = (
+  sessionsPreviewRequests: BoxesState['sessionsPreviewRequests'],
+  action?: HandledActions,
+): BoxesState['sessionsPreviewRequests'] => {
+  if (!action) return sessionsPreviewRequests;
+  switch (action.type) {
+    case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:
+      return Map(action.payload.boxes.map(box => [box.boxName, BoxSessionPreviewRequestStatus()]));
+    case BoxesActionTypes.ADD_BOX_REQUEST_STARTED:
+      return sessionsPreviewRequests.set(
+        action.payload.boxName,
+        BoxSessionPreviewRequestStatus({
+          status: BoxSessionPreviewRequestStatusEnum.NEVER_STARTED,
         }),
       );
     case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_STARTED:
-      return state.updateIn(['sessionsPreviewRequests', action.payload.boxName], boxSessionPreviewRequest =>
+      return sessionsPreviewRequests.update(action.payload.boxName, boxSessionPreviewRequest =>
         boxSessionPreviewRequest.set('status', BoxSessionPreviewRequestStatusEnum.PENDING),
       );
     case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED:
-      return state
-        .updateIn(
-          ['sessionsPreviewRequests', action.payload.sessionPreview.boxName],
-          boxSessionPreviewRequest =>
-            boxSessionPreviewRequest.set('status', BoxSessionPreviewRequestStatusEnum.SUCCEEDED),
-        )
-        .setIn(
-          ['sessions', action.payload.sessionPreview.boxName],
-          Session({
-            boxName: action.payload.sessionPreview.boxName,
-            flashcardsToReview: action.payload.sessionPreview.flashcardsToReview,
-          }),
-        );
+      return sessionsPreviewRequests.update(action.payload.sessionPreview.boxName, boxSessionPreviewRequest =>
+        boxSessionPreviewRequest.set('status', BoxSessionPreviewRequestStatusEnum.SUCCEEDED),
+      );
     case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_FAILED:
-      return state.setIn(
-        ['sessionsPreviewRequests', action.payload.boxName],
+      return sessionsPreviewRequests.set(
+        action.payload.boxName,
         BoxSessionPreviewRequestStatus({
           status: BoxSessionPreviewRequestStatusEnum.FAILED,
           error: action.payload.error,
         }),
       );
   }
-  return state;
+  return sessionsPreviewRequests;
 };
+
+const boxesRequestStatusReducer = (
+  boxesRequestStatus: BoxesState['boxesRequestStatus'],
+  action?: HandledActions,
+): BoxesState['boxesRequestStatus'] => {
+  if (!action) return boxesRequestStatus;
+  switch (action.type) {
+    case BoxesActionTypes.BOXES_REQUEST_STARTED:
+      return boxesRequestStatus.set('status', BoxesRequestStatusEnum.PENDING);
+    case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:
+      return boxesRequestStatus.set('status', BoxesRequestStatusEnum.SUCCEEDED);
+    case BoxesActionTypes.BOXES_REQUEST_FAILED:
+      return BoxesRequestStatus({
+        status: BoxesRequestStatusEnum.FAILED,
+        error: action.payload.error,
+      });
+  }
+  return boxesRequestStatus;
+};
+
+const addBoxRequestStatusReducer = (
+  addBoxRequestStatus: BoxesState['addBoxRequestStatus'],
+  action?: HandledActions,
+): BoxesState['addBoxRequestStatus'] => {
+  if (!action) return addBoxRequestStatus;
+  switch (action.type) {
+    case BoxesActionTypes.ADD_BOX_REQUEST_SUCCEEDED:
+      return addBoxRequestStatus.set('status', AddBoxRequestStatusEnum.SUCCEEDED);
+    case BoxesActionTypes.ADD_BOX_REQUEST_FAILED:
+      return AddBoxRequestStatus({
+        status: AddBoxRequestStatusEnum.FAILED_WITH_UNKNOWN_ERROR,
+        error: action.error,
+      });
+  }
+  return addBoxRequestStatus;
+};
+
+export const boxesReducer = (state = BoxesState(), action?: HandledActions): BoxesState =>
+  BoxesState({
+    data: dataReducer(state.data, action),
+    sessions: sessionsReducer(state.sessions, action),
+    sessionsPreviewRequests: sessionsPreviewRequestsReducer(state.sessionsPreviewRequests, action),
+    boxesRequestStatus: boxesRequestStatusReducer(state.boxesRequestStatus, action),
+    addBoxRequestStatus: addBoxRequestStatusReducer(state.addBoxRequestStatus, action),
+  });
