@@ -133,17 +133,24 @@ export const boxesReducer = (state = BoxesState(), action?: HandledActions): Box
         }),
       );
     case BoxesActionTypes.ADD_BOX_REQUEST_STARTED:
-      return state.update('data', boxMap =>
-        boxMap.set(
-          action.payload.boxName,
-          Box({
-            boxName: action.payload.boxName,
-            archivedFlashcards: 0,
-            totalFlashcards: 1,
-            optimistic: true,
+      return state
+        .update('data', boxMap =>
+          boxMap.set(
+            action.payload.boxName,
+            Box({
+              boxName: action.payload.boxName,
+              archivedFlashcards: 0,
+              totalFlashcards: 1,
+              optimistic: true,
+            }),
+          ),
+        )
+        .setIn(
+          ['sessionsPreviewRequests', action.payload.boxName],
+          BoxSessionPreviewRequestStatus({
+            status: BoxSessionPreviewRequestStatusEnum.NEVER_STARTED,
           }),
-        ),
-      );
+        );
     case BoxesActionTypes.ADD_BOX_REQUEST_SUCCEEDED:
       return state.set(
         'addBoxRequestStatus',

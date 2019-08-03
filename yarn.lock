@@ -1534,6 +1534,13 @@
   resolved "https://registry.yarnpkg.com/@types/user-event/-/user-event-1.4.1.tgz#ff359a4be77c9c7e0eea5f1c638b790cceb87a98"
   integrity sha512-JkB3xL3LZPdTmhaVaTqO6Dp8mblPC+STFrrAalHMT7EgcGn4NI18HVxnTwCrQGyeGNaOolTAMTRfIVvEyuNrSQ==
 
+"@types/uuid@^3.4.5":
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.5.tgz#d4dc10785b497a1474eae0ba7f0cb09c0ddfd6eb"
+  integrity sha512-MNL15wC3EKyw1VLF+RoVO4hJJdk9t/Hlv3rt1OL65Qvuadm4BYo6g9ZJQqoq7X8NBFSsQXgAujWciovh2lpVjA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/vfile-message@*":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/vfile-message/-/vfile-message-1.0.1.tgz#e1e9895cc6b36c462d4244e64e6d0b6eaf65355a"

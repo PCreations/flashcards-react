@@ -236,4 +236,48 @@ describe('fetching session preview', () => {
       error: 'some error',
     });
   });
+
+  xtest(`
+  given some boxes have been fetched
+  and a new box has just been added
+  when a fetchSessionPreview action is dispatched for this new box
+  then the boxSessionPreviewRequestStatus selector should return PENDING on the first state update
+  then the getSessionPreview selector should return the correct session preview
+  and the getBoxSessionPreviewRequestStatus selector should return SUCCEED on the last state update
+`, async () => {
+    const boxes = getTestBoxesData();
+    const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
+    const theNewBox = Box({
+      boxName: 'the new box',
+      totalFlashcards: 1,
+      archivedFlashcards: 0,
+    });
+    const store = createTestStore(
+      {
+        fetchSessionPreview: jest.fn().mockResolvedValueOnce({
+          ...theNewBox,
+          flashcardsToReview: 1,
+        }),
+      },
+      initialState,
+    );
+    await store.dispatch(addBox({ boxName: theNewBox.boxName, flashcardAnswer: '', flashcardQuestion: '' }));
+    const updates: FlashcardsAppState[] = [];
+    store.subscribe(() => updates.push(store.getState()));
+    await store.dispatch(fetchSessionPreview({ boxName: theNewBox.boxName }));
+    expect(getBoxSessionPreviewRequestStatus(theNewBox.boxName, updates[0]).status).toEqual(
+      BoxSessionPreviewRequestStatusEnum.PENDING,
+    );
+    expect(getSessionPreview(theNewBox.boxName, updates[1])).toEqual(
+      SessionPreview({
+        boxName: theNewBox.boxName,
+        totalFlashcards: theNewBox.totalFlashcards,
+        archivedFlashcards: theNewBox.archivedFlashcards,
+        flashcardsToReview: 1,
+      }),
+    );
+    expect(getBoxSessionPreviewRequestStatus(theNewBox.boxName, updates[1]).status).toEqual(
+      BoxSessionPreviewRequestStatusEnum.SUCCEEDED,
+    );
+  });
 });
