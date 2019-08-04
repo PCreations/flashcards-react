@@ -1,11 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  getSessionPreview,
-  shouldSessionPreviewRequestBeStarted,
-  isSessionPreviewRequestPending,
-  getSessionPreviewRequestError,
-} from './core/store/boxes';
+import { boxesSelectors } from './core/store';
 import { fetchSessionPreview } from './core/store/boxes/actions';
 import { BoxSessionPreview } from './BoxSessionPreview';
 
@@ -14,17 +9,19 @@ type BoxSessionScreenProps = {
 };
 
 export const BoxSessionScreen: React.FC<BoxSessionScreenProps> = ({ boxName }) => {
-  const getSessionPreviewSelector = useMemo(() => getSessionPreview.bind(null, boxName), [boxName]);
+  const getSessionPreviewSelector = useMemo(() => boxesSelectors.getSessionPreview.bind(null, boxName), [
+    boxName,
+  ]);
   const shouldSessionPreviewRequestBeStartedSelector = useMemo(
-    () => shouldSessionPreviewRequestBeStarted.bind(null, boxName),
+    () => boxesSelectors.shouldSessionPreviewRequestBeStarted.bind(null, boxName),
     [boxName],
   );
   const isSessionPreviewRequestPendingSelector = useMemo(
-    () => isSessionPreviewRequestPending.bind(null, boxName),
+    () => boxesSelectors.isSessionPreviewRequestPending.bind(null, boxName),
     [boxName],
   );
   const sessionPreviewRequestErrorSelector = useMemo(
-    () => getSessionPreviewRequestError.bind(null, boxName),
+    () => boxesSelectors.getSessionPreviewRequestError.bind(null, boxName),
     [boxName],
   );
   const shouldSessionPreviewBeStarted = useSelector(shouldSessionPreviewRequestBeStartedSelector);

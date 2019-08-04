@@ -4,7 +4,7 @@ import { AuthState } from './auth/reducers';
 import { compose, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
 import { reducer as boxesReducer, BoxesState, createSelectors as createBoxesSelectors } from './boxes';
-import { FetchedBoxData, FetchedSessionPreviewData } from './boxes/types';
+import { FetchedBoxData, FetchedSessionPreviewData } from './boxes';
 
 declare global {
   interface Window {

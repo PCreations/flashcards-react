@@ -1,5 +1,4 @@
 import React from 'react';
-import { BoxSessionPreviewRequestStatusEnum } from './core/store/boxes';
 
 type BoxSessionPreviewProps = {
   isSessionPreviewLoading: boolean;
