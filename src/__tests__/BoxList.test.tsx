@@ -2,7 +2,6 @@ import React from 'react';
 import 'jest-dom/extend-expect';
 import { cleanup } from 'react-testing-library';
 import { BoxList } from '../BoxList';
-import { BoxesRequestStatusEnum } from '../core/store/boxes';
 import { createRender } from './createRender';
 import { expectAButtonToAddNewBoxToBeVisible } from './utils';
 import { getTestBoxesData } from './data/boxes';
@@ -11,22 +10,18 @@ describe('BoxList', () => {
   afterEach(cleanup);
   it('should render the call to action to select a box if not loading', () => {
     const render = createRender({});
-    const { getByText } = render(
-      <BoxList boxes={[]} boxesRequestStatus={BoxesRequestStatusEnum.NEVER_STARTED} />,
-    );
+    const { getByText } = render(<BoxList boxes={[]} isBoxesRequestPending={false} />);
     expect(getByText(/select a box :/i)).toBeInTheDocument();
   });
   it('should inform that the boxes are loading if boxes request is pending', () => {
     const render = createRender({});
-    const { getByText } = render(<BoxList boxes={[]} boxesRequestStatus={BoxesRequestStatusEnum.PENDING} />);
+    const { getByText } = render(<BoxList boxes={[]} isBoxesRequestPending={true} />);
     expect(getByText(/loading/i)).toBeInTheDocument();
   });
   it('should render the given boxes and a button to add new box', () => {
     const render = createRender({});
     const boxes = getTestBoxesData();
-    const { getAllByTestId, getByText, getByLabelText } = render(
-      <BoxList boxes={boxes} boxesRequestStatus={BoxesRequestStatusEnum.SUCCEEDED} />,
-    );
+    const { getAllByTestId, getByText, getByLabelText } = render(<BoxList boxes={boxes} />);
     boxes.map(b => expect(getByText(b.boxName)).toBeInTheDocument());
     expect(getAllByTestId('boxFlashcardsTotal').map(e => e.textContent)).toEqual(
       boxes.map(b => `${b.totalFlashcards}`),
@@ -48,7 +43,6 @@ describe('BoxList', () => {
             archivedFlashcards: 0,
           },
         ]}
-        boxesRequestStatus={BoxesRequestStatusEnum.FAILED}
         boxesRequestError={expectedError}
       />,
     );
@@ -58,13 +52,7 @@ describe('BoxList', () => {
   it('should render the addBoxRequest error if the addBoxRequest has failed', () => {
     const render = createRender({});
     const expectedError = 'some error message';
-    const { getByRole } = render(
-      <BoxList
-        boxes={[]}
-        boxesRequestStatus={BoxesRequestStatusEnum.FAILED}
-        addBoxRequestError={expectedError}
-      />,
-    );
+    const { getByRole } = render(<BoxList boxes={[]} addBoxRequestError={expectedError} />);
     expect(getByRole('addBoxError')).toHaveTextContent(expectedError);
   });
 });

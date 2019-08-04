@@ -1,6 +1,19 @@
-import { List } from 'immutable';
+import { List, Record } from 'immutable';
 import { FlashcardsThunkAction } from '..';
-import { Box, SessionPreview } from './types';
+import { Box } from './data';
+
+export type FetchedBoxData = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+};
+
+export type FetchedSessionPreviewData = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+  flashcardsToReview: number;
+};
 
 export enum BoxesActionTypes {
   BOXES_REQUEST_STARTED = '[boxes] the boxes request has started',
@@ -51,6 +64,18 @@ export const addBoxRequestFailed = ({ error }: { error: string }) => ({
   error,
 });
 
+type BoxSessionProps = {
+  boxName: string;
+  flashcardsToReview: number;
+};
+
+export const BoxSession = Record<BoxSessionProps>({
+  boxName: '',
+  flashcardsToReview: 0,
+});
+
+export type BoxSession = ReturnType<typeof BoxSession>;
+
 export const boxSessionPreviewRequestStarted = ({ boxName }: { boxName: string }) => ({
   type: BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_STARTED as BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_STARTED,
   payload: {
@@ -61,7 +86,7 @@ export const boxSessionPreviewRequestStarted = ({ boxName }: { boxName: string }
 export const boxSessionPreviewRequestSucceeded = ({
   sessionPreview,
 }: {
-  sessionPreview: SessionPreview;
+  sessionPreview: FetchedSessionPreviewData;
 }) => ({
   type: BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED as BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED,
   payload: {

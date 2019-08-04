@@ -3,8 +3,8 @@ import { authReducer } from './auth/reducers';
 import { AuthState } from './auth/reducers';
 import { compose, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
-import { boxesReducer, BoxesState } from './boxes/reducers';
-import { SessionPreview } from './boxes/types';
+import { reducer as boxesReducer, BoxesState, createSelectors as createBoxesSelectors } from './boxes';
+import { FetchedBoxData, FetchedSessionPreviewData } from './boxes/types';
 
 declare global {
   interface Window {
@@ -26,15 +26,11 @@ export const rootReducer = (state = FlashcardsAppState(), action?: any) =>
     boxes: boxesReducer(state.boxes, action),
   });
 
-type FetchedBoxData = {
-  boxName: string;
-  totalFlashcards: number;
-  archivedFlashcards: number;
-};
+export const boxesSelectors = createBoxesSelectors((state: FlashcardsAppState) => state.boxes);
 
 export type FlashcardsAppDependencies = {
   fetchBoxes: () => Promise<FetchedBoxData[]>;
-  fetchSessionPreview: ({ boxName }: { boxName: string }) => Promise<SessionPreview>;
+  fetchSessionPreview: ({ boxName }: { boxName: string }) => Promise<FetchedSessionPreviewData>;
   signIn: () => Promise<{ userId: string }>;
   saveAuthData: ({ userId }: { userId: string }) => Promise<boolean>;
   getAuthData: () => Promise<{ userId: string }>;
