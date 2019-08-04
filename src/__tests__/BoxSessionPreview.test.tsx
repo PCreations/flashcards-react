@@ -11,20 +11,9 @@ describe('BoxSessionPreview', () => {
     const render = createRender({});
     const { getByText } = render(
       <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.PENDING}
-        box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
-        numberOfFlashcardsToReview={7}
-      />,
-    );
-    expect(getByText(/loading/i)).toBeInTheDocument();
-  });
-  it('should inform that the session preview is loading if session preview request is not yet started', () => {
-    const render = createRender({});
-    const { getByText } = render(
-      <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.NEVER_STARTED}
-        box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
-        numberOfFlashcardsToReview={7}
+        isSessionPreviewLoading={true}
+        box={{ name: 'the box', totalFlashcards: 0, archivedFlashcards: 0 }}
+        numberOfFlashcardsToReview={0}
       />,
     );
     expect(getByText(/loading/i)).toBeInTheDocument();
@@ -41,7 +30,7 @@ describe('BoxSessionPreview', () => {
     const render = createRender({});
     const { getByText } = render(
       <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.SUCCEEDED}
+        isSessionPreviewLoading={false}
         box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
         numberOfFlashcardsToReview={7}
       />,
@@ -58,10 +47,10 @@ describe('BoxSessionPreview', () => {
     const expectedError = 'some error message';
     const { getByRole } = render(
       <BoxSessionPreview
-        sessionPreviewRequestStatus={BoxSessionPreviewRequestStatusEnum.FAILED}
+        isSessionPreviewLoading={false}
         sessionPreviewRequestError={expectedError}
-        box={{ name: 'the box', totalFlashcards: 50, archivedFlashcards: 20 }}
-        numberOfFlashcardsToReview={7}
+        box={{ name: 'the box', totalFlashcards: 0, archivedFlashcards: 0 }}
+        numberOfFlashcardsToReview={0}
       />,
     );
     expect(getByRole('sessionPreviewError')).toHaveTextContent(expectedError);

@@ -4,27 +4,29 @@ import { getTestBoxesData } from '../../../../__tests__/data/boxes';
 import { FlashcardsAppState, rootReducer } from '../..';
 import {
   getBoxes,
-  getBoxesRequestStatus,
   getSessionPreview,
-  BoxesRequestStatusEnum,
   fetchBoxes,
   addBox,
-  getAddBoxRequestStatus,
-  getBoxSessionPreviewRequestStatus,
+  shouldBoxesRequestBeStarted,
+  isBoxesRequestPending,
+  getBoxesRequestStatusError,
+  getAddBoxRequestStatusError,
+  shouldSessionPreviewRequestBeStarted,
+  isSessionPreviewRequestPending,
+  getSessionPreviewRequestError,
 } from '..';
 import { Box, SessionPreview } from '../types';
 import { boxesRequestSucceeded, fetchSessionPreview } from '../actions';
-import { AddBoxRequestStatusEnum, BoxSessionPreviewRequestStatusEnum } from '../reducers';
 
 describe('fetching boxes', () => {
   test(`
   given no boxes have been fetched yet
   then the getBoxes selector should return an empty array
-  and the getBoxesRequestStatus selector should return NEVER_STARTED
+  and the shouldBoxesRequestBeStarted selector should return true
 `, () => {
     const store = createTestStore();
     expect(getBoxes(store.getState())).toEqual(List());
-    expect(getBoxesRequestStatus(store.getState()).status).toEqual(BoxesRequestStatusEnum.NEVER_STARTED);
+    expect(shouldBoxesRequestBeStarted(store.getState())).toEqual(true);
   });
 
   test(`
@@ -32,7 +34,6 @@ describe('fetching boxes', () => {
   when a fetchBoxes action is dispatched
   then the boxesRequestStatus selector should return PENDING on the first state update
   then the getBoxes selector should return the boxes array
-  and the boxesRequestStatus selector should return SUCCEED on the last state update
 `, async () => {
     const boxes = getTestBoxesData();
     const updates: FlashcardsAppState[] = [];
@@ -41,9 +42,8 @@ describe('fetching boxes', () => {
     });
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(fetchBoxes());
-    expect(getBoxesRequestStatus(updates[0]).status).toEqual(BoxesRequestStatusEnum.PENDING);
+    expect(isBoxesRequestPending(updates[0])).toEqual(true);
     expect(getBoxes(updates[1])).toEqual(List(boxes.map(Box)));
-    expect(getBoxesRequestStatus(updates[1]).status).toEqual(BoxesRequestStatusEnum.SUCCEEDED);
   });
 
   test(`
@@ -59,10 +59,7 @@ describe('fetching boxes', () => {
     });
     await store.dispatch(fetchBoxes());
     expect(getBoxes(store.getState())).toEqual(List());
-    expect(getBoxesRequestStatus(store.getState()).toJS()).toEqual({
-      status: BoxesRequestStatusEnum.FAILED,
-      error: 'some error',
-    });
+    expect(getBoxesRequestStatusError(store.getState())).toEqual('some error');
   });
 });
 
@@ -93,10 +90,6 @@ describe('adding a box', () => {
         optimistic: true,
       },
     ]);
-    expect(getAddBoxRequestStatus(updates[1]).toJS()).toEqual({
-      status: AddBoxRequestStatusEnum.SUCCEEDED,
-      error: undefined,
-    });
   });
 
   test(`
@@ -131,7 +124,7 @@ describe('adding a box', () => {
   when a addBox action is dispatched for a box named "My New Awesome Box"
   and the server eventually returns an unknown error
   then the boxes list should still optimistically contain My New Awesome Box with 1 total flashcards and 0 archived flashcards and an optimistic flag set to true
-  and the getAddBoxRequestStatus should return FAILED_WITH_UNKNOWN_ERROR
+  and the getAddBoxRequestStatusError should return a comprehensive error message
 `, async () => {
     const boxes = getTestBoxesData();
     const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
@@ -145,10 +138,9 @@ describe('adding a box', () => {
     await store.dispatch(
       addBox({ boxName: 'My New Awesome Box', flashcardAnswer: '', flashcardQuestion: '' }),
     );
-    expect(getAddBoxRequestStatus(store.getState()).toJS()).toEqual({
-      status: AddBoxRequestStatusEnum.FAILED_WITH_UNKNOWN_ERROR,
-      error: 'An error occured while creating the "My New Awesome Box" box. Please retry later',
-    });
+    expect(getAddBoxRequestStatusError(store.getState())).toEqual(
+      'An error occured while creating the "My New Awesome Box" box. Please retry later',
+    );
   });
 });
 
@@ -169,18 +161,15 @@ describe('fetching session preview', () => {
         archivedFlashcards: boxes[0].archivedFlashcards,
       }),
     );
-    expect(getBoxSessionPreviewRequestStatus(boxes[0].boxName, store.getState()).status).toEqual(
-      BoxesRequestStatusEnum.NEVER_STARTED,
-    );
+    expect(shouldSessionPreviewRequestBeStarted(boxes[0].boxName, store.getState())).toEqual(true);
   });
 
   test(`
   given some boxes have been fetched
   abd the session preview for the box box42 has not been fetched
   when a fetchSessionPreview action is dispatched
-  then the boxSessionPreviewRequestStatus selector should return PENDING on the first state update
+  then the isBoxSessionPreviewRequestPending selector should return true on the first state update
   then the getSessionPreview selector should return the correct session preview
-  and the getBoxSessionPreviewRequestStatus selector should return SUCCEED on the last state update
   `, async () => {
     const boxes = getTestBoxesData();
     const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
@@ -198,9 +187,7 @@ describe('fetching session preview', () => {
     const updates: FlashcardsAppState[] = [];
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(fetchSessionPreview({ boxName: boxes[0].boxName }));
-    expect(getBoxSessionPreviewRequestStatus(boxes[0].boxName, updates[0]).status).toEqual(
-      BoxSessionPreviewRequestStatusEnum.PENDING,
-    );
+    expect(isSessionPreviewRequestPending(boxes[0].boxName, updates[0])).toEqual(true);
     expect(getSessionPreview(boxes[0].boxName, updates[1])).toEqual(
       SessionPreview({
         boxName: boxes[0].boxName,
@@ -209,9 +196,6 @@ describe('fetching session preview', () => {
         flashcardsToReview: 7,
       }),
     );
-    expect(getBoxSessionPreviewRequestStatus(boxes[0].boxName, updates[1]).status).toEqual(
-      BoxSessionPreviewRequestStatusEnum.SUCCEEDED,
-    );
   });
 
   test(`
@@ -219,7 +203,7 @@ describe('fetching session preview', () => {
   and the session preview for the box box42 has not been fetched
   and the fetchSessionPreview request eventually throws an error
   when a fetchSessionPreview action is dispatched
-  then the getBoxSessionPreviewRequestStatus selector should indicate that something got wrong, with the thrown error's message
+  then the getSessionPreviewRequestError selector should return the thrown error's message
 `, async () => {
     const boxes = getTestBoxesData();
     const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
@@ -231,20 +215,15 @@ describe('fetching session preview', () => {
       initialState,
     );
     await store.dispatch(fetchSessionPreview({ boxName: boxes[0].boxName }));
-    expect(getBoxSessionPreviewRequestStatus(boxes[0].boxName, store.getState()).toJS()).toEqual({
-      status: BoxSessionPreviewRequestStatusEnum.FAILED,
-      error: 'some error',
-    });
+    expect(getSessionPreviewRequestError(boxes[0].boxName, store.getState())).toEqual('some error');
   });
 
   test(`
   given some boxes have been fetched
   and a new box has just been added
   when a fetchSessionPreview action is dispatched for this new box
-  then the boxSessionPreviewRequestStatus selector should return PENDING on the first state update
-  then the getSessionPreview selector should return the correct session preview
-  and the getBoxSessionPreviewRequestStatus selector should return SUCCEED on the last state update
-`, async () => {
+  then the isSessionPreviewRequestPending selector should return true on the first state update
+  then the getSessionPreview selector should return the correct session preview`, async () => {
     const boxes = getTestBoxesData();
     const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
     const theNewBox = Box({
@@ -265,9 +244,7 @@ describe('fetching session preview', () => {
     const updates: FlashcardsAppState[] = [];
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(fetchSessionPreview({ boxName: theNewBox.boxName }));
-    expect(getBoxSessionPreviewRequestStatus(theNewBox.boxName, updates[0]).status).toEqual(
-      BoxSessionPreviewRequestStatusEnum.PENDING,
-    );
+    expect(isSessionPreviewRequestPending(theNewBox.boxName, updates[0])).toEqual(true);
     expect(getSessionPreview(theNewBox.boxName, store.getState())).toEqual(
       SessionPreview({
         boxName: theNewBox.boxName,
@@ -275,9 +252,6 @@ describe('fetching session preview', () => {
         archivedFlashcards: theNewBox.archivedFlashcards,
         flashcardsToReview: 1,
       }),
-    );
-    expect(getBoxSessionPreviewRequestStatus(theNewBox.boxName, store.getState()).status).toEqual(
-      BoxSessionPreviewRequestStatusEnum.SUCCEEDED,
     );
   });
 });

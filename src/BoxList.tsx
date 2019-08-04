@@ -1,5 +1,4 @@
 import React from 'react';
-import { BoxesRequestStatusEnum } from './core/store/boxes';
 import { AddBoxButton } from './AddBoxButton';
 import { buildUrl, RoutePath } from './router/state';
 import { Link } from './router';
@@ -12,7 +11,7 @@ type Box = {
 
 export type BoxListProps = {
   boxes: Box[];
-  boxesRequestStatus: BoxesRequestStatusEnum;
+  isBoxesRequestPending?: boolean;
   boxesRequestError?: string;
   addBoxRequestError?: string;
 };
@@ -23,11 +22,11 @@ const BoxRequestError: React.FC<{ error?: string; role: string }> = ({ error, ro
 
 export const BoxList: React.FC<BoxListProps> = ({
   boxes,
-  boxesRequestStatus,
+  isBoxesRequestPending = false,
   boxesRequestError,
   addBoxRequestError,
 }) =>
-  boxesRequestStatus === BoxesRequestStatusEnum.PENDING ? (
+  isBoxesRequestPending ? (
     <div>loading...</div>
   ) : (
     <div>
