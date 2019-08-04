@@ -1,8 +1,23 @@
-import { Map } from 'immutable';
-import { Box } from '../types';
+import { Map, Record } from 'immutable';
 import { boxesRequestSucceeded, addBoxRequestStarted, BoxesActionTypes } from '../actions';
 
-type Data = Map<Box['boxName'], Box>;
+type BoxProps = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+  optimistic?: boolean;
+};
+
+export const Box = Record<BoxProps>({
+  boxName: '',
+  totalFlashcards: 0,
+  archivedFlashcards: 0,
+  optimistic: false,
+});
+
+export type Box = ReturnType<typeof Box>;
+
+export type Data = Map<Box['boxName'], Box>;
 
 const Data = (data?: Data) => data || Map<Box['boxName'], Box>();
 
@@ -10,7 +25,7 @@ export type HandledActions =
   | ReturnType<typeof boxesRequestSucceeded>
   | ReturnType<typeof addBoxRequestStarted>;
 
-export const dataReducer = (data = Data(), action?: HandledActions): Data => {
+export const reducer = (data = Data(), action?: HandledActions): Data => {
   if (!action) return data;
   switch (action.type) {
     case BoxesActionTypes.BOXES_REQUEST_SUCCEEDED:

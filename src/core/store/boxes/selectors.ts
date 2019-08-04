@@ -1,43 +1,59 @@
-import { FlashcardsAppState } from '..';
-import {
-  BoxSessionPreviewRequestStatus,
-  BoxesRequestStatusEnum,
-  BoxSessionPreviewRequestStatusEnum,
-} from './reducers';
-import { SessionPreview, Box, Session } from './types';
+import { Record } from 'immutable';
+import * as data from './data';
+import * as sessions from './sessions';
+import * as sessionsPreviewRequests from './sessionsPreviewRequests';
+import * as boxesRequestStatus from './boxesRequestStatus';
+import * as addBoxRequestStatus from './addBoxRequestStatus';
+import { BoxesState } from './reducer';
 
-export const getBoxes = (state: FlashcardsAppState) => state.boxes.data.toList();
-
-export const shouldBoxesRequestBeStarted = (state: FlashcardsAppState) =>
-  state.boxes.boxesRequestStatus.status === BoxesRequestStatusEnum.NEVER_STARTED;
-
-export const isBoxesRequestPending = (state: FlashcardsAppState) =>
-  state.boxes.boxesRequestStatus.status === BoxesRequestStatusEnum.PENDING;
-
-export const getBoxesRequestStatusError = (state: FlashcardsAppState) => state.boxes.boxesRequestStatus.error;
-
-export const getAddBoxRequestStatusError = (state: FlashcardsAppState) =>
-  state.boxes.addBoxRequestStatus.error;
-
-export const getSessionPreview = (boxName: string, state: FlashcardsAppState) => {
-  const box = state.boxes.data.get(boxName, Box({ boxName }));
-  const session = state.boxes.sessions.get(boxName, Session({ boxName }));
-  const sessionPreview = SessionPreview({
-    boxName: session.boxName,
-    totalFlashcards: box.totalFlashcards,
-    archivedFlashcards: box.archivedFlashcards,
-    flashcardsToReview: session.flashcardsToReview,
-  });
-  return sessionPreview;
+type SessionPreviewProps = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+  flashcardsToReview: number;
 };
 
-export const shouldSessionPreviewRequestBeStarted = (boxName: string, state: FlashcardsAppState) =>
-  state.boxes.sessionsPreviewRequests.get(boxName, BoxSessionPreviewRequestStatus()).status ===
-  BoxSessionPreviewRequestStatusEnum.NEVER_STARTED;
+export const SessionPreview = Record<SessionPreviewProps>({
+  boxName: '',
+  totalFlashcards: 0,
+  archivedFlashcards: 0,
+  flashcardsToReview: 0,
+});
 
-export const isSessionPreviewRequestPending = (boxName: string, state: FlashcardsAppState) =>
-  state.boxes.sessionsPreviewRequests.get(boxName, BoxSessionPreviewRequestStatus()).status ===
-  BoxSessionPreviewRequestStatusEnum.PENDING;
+export type SessionPreview = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+  flashcardsToReview: number;
+};
 
-export const getSessionPreviewRequestError = (boxName: string, state: FlashcardsAppState) =>
-  state.boxes.sessionsPreviewRequests.get(boxName, BoxSessionPreviewRequestStatus()).error;
+export const createSelectors = <S>(getBoxesSlice: (state: S) => BoxesState) => {
+  const dataSelectors = data.createSelectors((state: S) => getBoxesSlice(state).data);
+  const sessionsSelectors = sessions.createSelectors((state: S) => getBoxesSlice(state).sessions);
+  const sessionsPreviewSelectors = sessionsPreviewRequests.createSelectors(
+    (state: S) => getBoxesSlice(state).sessionsPreviewRequests,
+  );
+  const boxesRequestStatusSelectors = boxesRequestStatus.createSelectors(
+    (state: S) => getBoxesSlice(state).boxesRequestStatus,
+  );
+  const addBoxRequestStatusSelectors = addBoxRequestStatus.createSelectors(
+    (state: S) => getBoxesSlice(state).addBoxRequestStatus,
+  );
+  const getSessionPreview = (boxName: string, state: S) => {
+    const box = dataSelectors.getBox(boxName, state);
+    const flashcardsToReview = sessionsSelectors.getSessionFlashcardsToReview(boxName, state);
+    return SessionPreview({
+      boxName,
+      totalFlashcards: box.totalFlashcards,
+      archivedFlashcards: box.archivedFlashcards,
+      flashcardsToReview,
+    });
+  };
+  return {
+    getSessionPreview,
+    ...dataSelectors,
+    ...sessionsPreviewSelectors,
+    ...boxesRequestStatusSelectors,
+    ...addBoxRequestStatusSelectors,
+  };
+};

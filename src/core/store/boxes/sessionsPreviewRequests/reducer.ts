@@ -1,5 +1,4 @@
 import { Map, Record } from 'immutable';
-import { Box } from '../types';
 import {
   boxesRequestSucceeded,
   addBoxRequestStarted,
@@ -28,10 +27,10 @@ export const BoxSessionPreviewRequestStatus = Record<BoxSessionPreviewRequestSta
 
 type BoxSessionPreviewRequestStatus = ReturnType<typeof BoxSessionPreviewRequestStatus>;
 
-type SessionsPreviewRequests = Map<Box['boxName'], BoxSessionPreviewRequestStatus>;
+export type SessionsPreviewRequests = Map<string, BoxSessionPreviewRequestStatus>;
 
 const SessionsPreviewRequests = (sessionsPreviewRequests?: SessionsPreviewRequests) =>
-  sessionsPreviewRequests || Map<Box['boxName'], BoxSessionPreviewRequestStatus>();
+  sessionsPreviewRequests || Map<string, BoxSessionPreviewRequestStatus>();
 
 export type HandledActions =
   | ReturnType<typeof boxesRequestSucceeded>
@@ -40,7 +39,7 @@ export type HandledActions =
   | ReturnType<typeof boxSessionPreviewRequestSucceeded>
   | ReturnType<typeof boxSessionPreviewRequestFailed>;
 
-export const sessionsPreviewRequestsReducer = (
+export const reducer = (
   sessionsPreviewRequests = SessionsPreviewRequests(),
   action?: HandledActions,
 ): SessionsPreviewRequests => {

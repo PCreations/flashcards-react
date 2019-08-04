@@ -17,13 +17,13 @@ const AddBoxRequestStatus = Record<AddBoxRequestStatusProps>({
   error: undefined,
 });
 
-type AddBoxRequestStatus = ReturnType<typeof AddBoxRequestStatus>;
+export type AddBoxRequestStatus = ReturnType<typeof AddBoxRequestStatus>;
 
 export type HandledActions =
   | ReturnType<typeof addBoxRequestSucceeded>
   | ReturnType<typeof addBoxRequestFailed>;
 
-export const addBoxRequestStatusReducer = (
+export const reducer = (
   addBoxRequestStatus = AddBoxRequestStatus(),
   action?: HandledActions,
 ): AddBoxRequestStatus => {

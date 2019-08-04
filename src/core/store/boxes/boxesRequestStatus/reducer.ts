@@ -18,14 +18,14 @@ const BoxesRequestStatus = Record<BoxesRequestStatusProps>({
   error: undefined,
 });
 
-type BoxesRequestStatus = ReturnType<typeof BoxesRequestStatus>;
+export type BoxesRequestStatus = ReturnType<typeof BoxesRequestStatus>;
 
 export type HandledActions =
   | ReturnType<typeof boxesRequestStarted>
   | ReturnType<typeof boxesRequestSucceeded>
   | ReturnType<typeof boxesRequestFailed>;
 
-export const boxesRequestStatusReducer = (
+export const reducer = (
   boxesRequestStatus = BoxesRequestStatus(),
   action?: HandledActions,
 ): BoxesRequestStatus => {

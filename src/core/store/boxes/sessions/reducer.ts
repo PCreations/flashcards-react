@@ -1,14 +1,28 @@
-import { Map } from 'immutable';
-import { Box, Session } from '../types';
+import { Map, Record } from 'immutable';
 import { boxSessionPreviewRequestSucceeded, BoxesActionTypes } from '../actions';
 
-type Sessions = Map<Box['boxName'], Session>;
+type SessionProps = {
+  boxName: string;
+  flashcardsToReview: number;
+};
 
-const Sessions = (sessions?: Sessions) => sessions || Map<Box['boxName'], Session>();
+export const Session = Record<SessionProps>({
+  boxName: '',
+  flashcardsToReview: 0,
+});
+
+export type Session = {
+  boxName: string;
+  flashcardsToReview: number;
+};
+
+export type Sessions = Map<string, Session>;
+
+const Sessions = (sessions?: Sessions) => sessions || Map<string, Session>();
 
 export type HandledActions = ReturnType<typeof boxSessionPreviewRequestSucceeded>;
 
-export const sessionsReducer = (sessions = Sessions(), action?: HandledActions): Sessions => {
+export const reducer = (sessions = Sessions(), action?: HandledActions): Sessions => {
   if (!action) return sessions;
   switch (action.type) {
     case BoxesActionTypes.BOX_SESSION_PREVIEW_REQUEST_SUCCEEDED:

@@ -1,3 +1,3 @@
 export * from './selectors';
-export * from './reducers';
+export * from './reducer';
 export { fetchBoxes, addBox } from './actions';

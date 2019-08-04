@@ -1,22 +1,9 @@
 import { List } from 'immutable';
-import { createTestStore } from '../../../../__tests__/createTestStore';
-import { getTestBoxesData } from '../../../../__tests__/data/boxes';
-import { FlashcardsAppState, rootReducer } from '../..';
-import {
-  getBoxes,
-  getSessionPreview,
-  fetchBoxes,
-  addBox,
-  shouldBoxesRequestBeStarted,
-  isBoxesRequestPending,
-  getBoxesRequestStatusError,
-  getAddBoxRequestStatusError,
-  shouldSessionPreviewRequestBeStarted,
-  isSessionPreviewRequestPending,
-  getSessionPreviewRequestError,
-} from '..';
-import { Box, SessionPreview } from '../types';
-import { boxesRequestSucceeded, fetchSessionPreview } from '../actions';
+import { createTestStore } from '../../../__tests__/createTestStore';
+import { getTestBoxesData } from '../../../__tests__/data/boxes';
+import { FlashcardsAppState, rootReducer, boxesSelectors } from '..';
+import { fetchBoxes, addBox, Box, SessionPreview } from '../boxes';
+import { boxesRequestSucceeded, fetchSessionPreview } from '../boxes/actions';
 
 describe('fetching boxes', () => {
   test(`
@@ -25,8 +12,8 @@ describe('fetching boxes', () => {
   and the shouldBoxesRequestBeStarted selector should return true
 `, () => {
     const store = createTestStore();
-    expect(getBoxes(store.getState())).toEqual(List());
-    expect(shouldBoxesRequestBeStarted(store.getState())).toEqual(true);
+    expect(boxesSelectors.getBoxes(store.getState())).toEqual(List());
+    expect(boxesSelectors.shouldBoxesRequestBeStarted(store.getState())).toEqual(true);
   });
 
   test(`
@@ -42,8 +29,8 @@ describe('fetching boxes', () => {
     });
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(fetchBoxes());
-    expect(isBoxesRequestPending(updates[0])).toEqual(true);
-    expect(getBoxes(updates[1])).toEqual(List(boxes.map(Box)));
+    expect(boxesSelectors.isBoxesRequestPending(updates[0])).toEqual(true);
+    expect(boxesSelectors.getBoxes(updates[1])).toEqual(List(boxes.map(Box)));
   });
 
   test(`
@@ -58,8 +45,8 @@ describe('fetching boxes', () => {
       fetchBoxes: jest.fn().mockRejectedValueOnce(someError),
     });
     await store.dispatch(fetchBoxes());
-    expect(getBoxes(store.getState())).toEqual(List());
-    expect(getBoxesRequestStatusError(store.getState())).toEqual('some error');
+    expect(boxesSelectors.getBoxes(store.getState())).toEqual(List());
+    expect(boxesSelectors.getBoxesRequestStatusError(store.getState())).toEqual('some error');
   });
 });
 
@@ -81,7 +68,7 @@ describe('adding a box', () => {
     const updates: FlashcardsAppState[] = [];
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(addBox({ boxName: 'the new box', flashcardAnswer: '', flashcardQuestion: '' }));
-    expect(getBoxes(updates[1]).toJS()).toEqual([
+    expect(boxesSelectors.getBoxes(updates[1]).toJS()).toEqual([
       ...boxes.map(b => ({ ...b, optimistic: false })),
       {
         boxName: 'the new box',
@@ -109,7 +96,7 @@ describe('adding a box', () => {
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(addBox({ boxName: 'the new box', flashcardAnswer: '', flashcardQuestion: '' }));
     await store.dispatch(fetchBoxes());
-    expect(getBoxes(updates[0]).toJS()).toEqual([
+    expect(boxesSelectors.getBoxes(updates[0]).toJS()).toEqual([
       {
         boxName: 'the new box',
         totalFlashcards: 1,
@@ -138,7 +125,7 @@ describe('adding a box', () => {
     await store.dispatch(
       addBox({ boxName: 'My New Awesome Box', flashcardAnswer: '', flashcardQuestion: '' }),
     );
-    expect(getAddBoxRequestStatusError(store.getState())).toEqual(
+    expect(boxesSelectors.getAddBoxRequestStatusError(store.getState())).toEqual(
       'An error occured while creating the "My New Awesome Box" box. Please retry later',
     );
   });
@@ -154,14 +141,16 @@ describe('fetching session preview', () => {
     const boxes = getTestBoxesData();
     const initialState = rootReducer(undefined, boxesRequestSucceeded({ boxes: List(boxes.map(Box)) }));
     const store = createTestStore({}, initialState);
-    expect(getSessionPreview(boxes[0].boxName, store.getState())).toEqual(
+    expect(boxesSelectors.getSessionPreview(boxes[0].boxName, store.getState())).toEqual(
       SessionPreview({
         boxName: boxes[0].boxName,
         totalFlashcards: boxes[0].totalFlashcards,
         archivedFlashcards: boxes[0].archivedFlashcards,
       }),
     );
-    expect(shouldSessionPreviewRequestBeStarted(boxes[0].boxName, store.getState())).toEqual(true);
+    expect(boxesSelectors.shouldSessionPreviewRequestBeStarted(boxes[0].boxName, store.getState())).toEqual(
+      true,
+    );
   });
 
   test(`
@@ -187,8 +176,8 @@ describe('fetching session preview', () => {
     const updates: FlashcardsAppState[] = [];
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(fetchSessionPreview({ boxName: boxes[0].boxName }));
-    expect(isSessionPreviewRequestPending(boxes[0].boxName, updates[0])).toEqual(true);
-    expect(getSessionPreview(boxes[0].boxName, updates[1])).toEqual(
+    expect(boxesSelectors.isSessionPreviewRequestPending(boxes[0].boxName, updates[0])).toEqual(true);
+    expect(boxesSelectors.getSessionPreview(boxes[0].boxName, updates[1])).toEqual(
       SessionPreview({
         boxName: boxes[0].boxName,
         totalFlashcards: boxes[0].totalFlashcards,
@@ -215,7 +204,9 @@ describe('fetching session preview', () => {
       initialState,
     );
     await store.dispatch(fetchSessionPreview({ boxName: boxes[0].boxName }));
-    expect(getSessionPreviewRequestError(boxes[0].boxName, store.getState())).toEqual('some error');
+    expect(boxesSelectors.getSessionPreviewRequestError(boxes[0].boxName, store.getState())).toEqual(
+      'some error',
+    );
   });
 
   test(`
@@ -244,8 +235,8 @@ describe('fetching session preview', () => {
     const updates: FlashcardsAppState[] = [];
     store.subscribe(() => updates.push(store.getState()));
     await store.dispatch(fetchSessionPreview({ boxName: theNewBox.boxName }));
-    expect(isSessionPreviewRequestPending(theNewBox.boxName, updates[0])).toEqual(true);
-    expect(getSessionPreview(theNewBox.boxName, store.getState())).toEqual(
+    expect(boxesSelectors.isSessionPreviewRequestPending(theNewBox.boxName, updates[0])).toEqual(true);
+    expect(boxesSelectors.getSessionPreview(theNewBox.boxName, store.getState())).toEqual(
       SessionPreview({
         boxName: theNewBox.boxName,
         totalFlashcards: theNewBox.totalFlashcards,

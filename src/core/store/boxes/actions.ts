@@ -1,6 +1,19 @@
 import { List, Record } from 'immutable';
 import { FlashcardsThunkAction } from '..';
-import { Box, FetchedSessionPreviewData } from './types';
+import { Box } from './data';
+
+export type FetchedBoxData = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+};
+
+export type FetchedSessionPreviewData = {
+  boxName: string;
+  totalFlashcards: number;
+  archivedFlashcards: number;
+  flashcardsToReview: number;
+};
 
 export enum BoxesActionTypes {
   BOXES_REQUEST_STARTED = '[boxes] the boxes request has started',

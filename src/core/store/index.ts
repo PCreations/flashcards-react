@@ -3,7 +3,7 @@ import { authReducer } from './auth/reducers';
 import { AuthState } from './auth/reducers';
 import { compose, createStore as createReduxStore, applyMiddleware, AnyAction } from 'redux';
 import thunk, { ThunkMiddleware, ThunkAction } from 'redux-thunk';
-import { reducer as boxesReducer, BoxesState } from './boxes/reducers';
+import { reducer as boxesReducer, BoxesState, createSelectors as createBoxesSelectors } from './boxes';
 import { FetchedBoxData, FetchedSessionPreviewData } from './boxes/types';
 
 declare global {
@@ -25,6 +25,8 @@ export const rootReducer = (state = FlashcardsAppState(), action?: any) =>
     auth: authReducer(state.auth, action),
     boxes: boxesReducer(state.boxes, action),
   });
+
+export const boxesSelectors = createBoxesSelectors((state: FlashcardsAppState) => state.boxes);
 
 export type FlashcardsAppDependencies = {
   fetchBoxes: () => Promise<FetchedBoxData[]>;
